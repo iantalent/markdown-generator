@@ -1,20 +1,38 @@
-import {SimplePage} from "./page";
-import {SimpleFragment, buildMarkdown} from "./fragment";
-import {Heading} from "./fragment/builtin";
+import {Page} from "./page";
+import {buildMarkdown} from "./fragment";
+import {isPage} from "./utils";
 
-export default (options: object, ctx: object) =>
+type PluginOptions = {
+	pages: Array<Page>
+}
+
+type AdditionalPages = {
+	path: string,
+	content: string,
+	frontmatter: any
+}
+
+export default (options: PluginOptions, ctx: object) =>
 {
-	console.log(options, ctx);
-	const testPage = (new SimplePage('Test Page title', '/test-page/'))
-		.add(new Heading('Sub title', 2));
+	const pages: Array<AdditionalPages> = [];
+	
+	if(Array.isArray(options['pages']) && options.pages.length)
+	{
+		for(const page of options.pages)
+		{
+			if(!isPage(page))
+				throw new Error('There is wrong page item');
+			
+			pages.push({
+				path: page.path(),
+				content: buildMarkdown(page),
+				frontmatter: page.frontmatter()
+			});
+		}
+	}
 	
 	return {
 		name: 'custom-pages-plugin',
-		additionalPages: [
-			{
-				path: testPage.path(),
-				content: buildMarkdown(testPage)
-			}
-		]
+		additionalPages: pages
 	};
 }

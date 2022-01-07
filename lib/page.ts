@@ -3,8 +3,6 @@ import {Heading} from "./fragment/builtin";
 
 export interface Page extends FragmentsContainer
 {
-	name(): string
-	
 	path(): string
 	
 	frontmatter(): any

@@ -1,3 +1,5 @@
+import {isFragmentsContainer} from "./utils";
+
 export type FragmentContent = (() => string) | string;
 
 export type FragmentsContainerEntry = Fragment | FragmentsContainer | string;
@@ -48,10 +50,7 @@ export class SimpleFragmentsContainer implements FragmentsContainer
 	
 }
 
-function isContainer(pretend: any): pretend is FragmentsContainer
-{
-	return typeof pretend['tree'] === 'function';
-}
+
 
 /**
  * @param {FragmentsContainer} container
@@ -66,7 +65,7 @@ export function buildMarkdown(container: FragmentsContainer, separator: string =
 			return entry;
 		else if(Array.isArray(entry))
 			return buildMarkdown((new SimpleFragmentsContainer()).add(entry), separator);
-		else if(isContainer(entry)) //FragmentsContainer
+		else if(isFragmentsContainer(entry)) //FragmentsContainer
 			return buildMarkdown(entry, separator);
 		else if(entry['content'])
 		{
