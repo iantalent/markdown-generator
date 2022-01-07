@@ -47,7 +47,6 @@ export class SimpleFragmentsContainer implements FragmentsContainer
 	{
 		return this.$fragments;
 	}
-	
 }
 
 

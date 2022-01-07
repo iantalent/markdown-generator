@@ -1,8 +1,10 @@
-import {Fragment, FragmentContent, SimpleFragment} from "../fragment";
+import {Fragment, FragmentContent} from "../fragment";
+
+type WrappedFragmentContent = string | Fragment;
 
 class WrappedFragment implements Fragment
 {
-	constructor(private readonly $content: string | Fragment, private readonly $before: string, private readonly $after: string)
+	constructor(private readonly $content: WrappedFragmentContent, private readonly $before: string, private readonly $after: string)
 	{
 	}
 	
@@ -19,7 +21,7 @@ class WrappedFragment implements Fragment
 export class Heading extends WrappedFragment
 {
 	
-	constructor(content: string | Fragment, level: number = 1)
+	constructor(content: WrappedFragmentContent, level: number = 1)
 	{
 		super(content, '#'.repeat(level) + ' ', '');
 	}
@@ -27,7 +29,7 @@ export class Heading extends WrappedFragment
 
 export class Bold extends WrappedFragment
 {
-	constructor(content: string | Fragment)
+	constructor(content: WrappedFragmentContent)
 	{
 		super(content, '**', '**')
 	}
@@ -35,7 +37,7 @@ export class Bold extends WrappedFragment
 
 export class Italic extends WrappedFragment
 {
-	constructor(content: string | Fragment)
+	constructor(content: WrappedFragmentContent)
 	{
 		super(content, '*', '*')
 	}
@@ -43,8 +45,31 @@ export class Italic extends WrappedFragment
 
 export class BoldItalic extends WrappedFragment
 {
-	constructor(content: string | Fragment)
+	constructor(content: WrappedFragmentContent)
 	{
 		super(content, '***', '***')
 	}
+}
+
+export class Code extends WrappedFragment
+{
+	constructor(content: WrappedFragmentContent)
+	{
+		super(content, '`', '`');
+	}
+}
+
+export class Link implements Fragment
+{
+	
+	constructor(private readonly name: string, private readonly link: string)
+	{
+	
+	}
+	
+	content()
+	{
+		return `[${this.name}](${this.link})`;
+	}
+	
 }
