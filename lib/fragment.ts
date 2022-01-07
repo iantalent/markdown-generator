@@ -56,7 +56,7 @@ export class SimpleFragmentsContainer implements FragmentsContainer
  * @param {string} separator
  * @returns {string}
  */
-export function buildMarkdown(container: FragmentsContainer, separator: string = '\n\r'): string
+export function buildMarkdown(container: FragmentsContainer, separator: string = "\r\n"): string
 {
 	return container.tree().map(entry =>
 	{
