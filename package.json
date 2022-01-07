@@ -1,0 +1,19 @@
+{
+  "name": "vuepress-plugin-custom-pages",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iantalent/vuepress-plugin-custom-pages.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iantalent/vuepress-custom-pages/issues"
+  },
+  "homepage": "https://github.com/iantalent/vuepress-custom-pages#readme"
+}
