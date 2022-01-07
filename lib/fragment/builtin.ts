@@ -1,22 +1,5 @@
-import {Fragment, FragmentContent} from "../fragment";
-
-type WrappedFragmentContent = string | Fragment;
-
-class WrappedFragment implements Fragment
-{
-	constructor(private readonly $content: WrappedFragmentContent, private readonly $before: string, private readonly $after: string)
-	{
-	}
-	
-	content()
-	{
-		return this.$before + (
-			typeof this.$content === 'string' ?
-				this.$content :
-				(typeof this.$content.content === 'string' ? this.$content.content : this.$content.content())
-		) + this.$after;
-	}
-}
+import {Fragment} from "../fragment";
+import {WrappedFragment, WrappedFragmentContent} from "./common";
 
 export class Heading extends WrappedFragment
 {
@@ -64,7 +47,6 @@ export class Link implements Fragment
 	
 	constructor(private readonly name: string, private readonly link: string)
 	{
-	
 	}
 	
 	content()
