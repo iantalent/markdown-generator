@@ -2,8 +2,11 @@
 	"name": "vuepress-plugin-custom-pages",
 	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"scripts": {
+		"prepublish": "npm run build",
+		"build": "tsc",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
@@ -15,5 +18,8 @@
 	"bugs": {
 		"url": "https://github.com/iantalent/vuepress-plugin-custom-pages/issues"
 	},
-	"homepage": "https://github.com/iantalent/vuepress-plugin-custom-pages#readme"
+	"homepage": "https://github.com/iantalent/vuepress-plugin-custom-pages#readme",
+	"devDependencies": {
+		"typescript": "^4.5.4"
+	}
 }
