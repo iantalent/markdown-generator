@@ -7,7 +7,7 @@ export interface Page
 	
 	frontmatter(): any
 	
-	tree() : RootContainer
+	tree(): RootContainer
 }
 
 export class SimplePage implements Page
