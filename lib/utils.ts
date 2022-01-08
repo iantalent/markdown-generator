@@ -1,5 +1,5 @@
 import {Page} from "./page";
-import {FragmentsContainer, InlineFragmentsContainer, SimpleFragmentsContainer} from "./container";
+import {FragmentsContainer, SimpleFragmentsContainer} from "./container";
 import {getTypeOrFunctionValue} from "./type";
 
 export function isFragmentsContainer(pretender: any): pretender is FragmentsContainer
