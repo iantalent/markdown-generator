@@ -1,10 +1,5 @@
-import {isFragmentsContainer} from "./utils";
-
 export type FragmentContent = (() => string) | string;
-
-export type FragmentsContainerEntry = Fragment | FragmentsContainer | string;
-
-export type FragmentsList = Array<FragmentsContainerEntry>;
+import {WrappedFragment, WrappedFragmentContent} from "./fragment/common";
 
 export interface Fragment
 {
@@ -23,60 +18,56 @@ export class SimpleFragment implements Fragment
 	};
 }
 
-export interface FragmentsContainer
+export class Heading extends WrappedFragment
 {
-	tree(): FragmentsList
-}
-
-export class SimpleFragmentsContainer implements FragmentsContainer
-{
-	private readonly $fragments: FragmentsList = [];
 	
-	/**
-	 *
-	 * @param {FragmentsContainerEntry} fragment
-	 * @returns {this}
-	 */
-	add(fragment: FragmentsContainerEntry)
+	constructor(content: WrappedFragmentContent, level: number = 1)
 	{
-		this.$fragments.push(fragment);
-		return this;
-	}
-	
-	tree(): FragmentsList
-	{
-		return this.$fragments;
+		super(content, '#'.repeat(level) + ' ', '');
 	}
 }
 
-
-
-/**
- * @param {FragmentsContainer} container
- * @param {string} separator
- * @returns {string}
- */
-export function buildMarkdown(container: FragmentsContainer, separator: string = "\r\n"): string
+export class Bold extends WrappedFragment
 {
-	return container.tree().map(entry =>
+	constructor(content: WrappedFragmentContent)
 	{
-		if(typeof entry === 'string')
-			return entry;
-		else if(Array.isArray(entry))
-			return buildMarkdown((new SimpleFragmentsContainer()).add(entry), separator);
-		else if(isFragmentsContainer(entry)) //FragmentsContainer
-			return buildMarkdown(entry, separator);
-		else if(entry['content'])
-		{
-			if(typeof entry['content'] === 'function')
-				return entry.content();
-			
-			if(typeof entry['content'] === 'string')
-				return entry.content;
-			
-			throw new Error('There is wrong content type in SimpleFragment. Allowed only function and string. Got ' + typeof entry['content']);
-		}
-		else
-			throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string');
-	}).filter(value => value).join(separator)
+		super(content, '**', '**')
+	}
+}
+
+export class Italic extends WrappedFragment
+{
+	constructor(content: WrappedFragmentContent)
+	{
+		super(content, '*', '*')
+	}
+}
+
+export class BoldItalic extends WrappedFragment
+{
+	constructor(content: WrappedFragmentContent)
+	{
+		super(content, '***', '***')
+	}
+}
+
+export class Code extends WrappedFragment
+{
+	constructor(content: WrappedFragmentContent)
+	{
+		super(content, '`', '`');
+	}
+}
+
+export class Link implements Fragment
+{
+	
+	constructor(private readonly name: string, private readonly link: string)
+	{
+	}
+	
+	content()
+	{
+		return `[${this.name}](${this.link})`;
+	}
 }

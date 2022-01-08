@@ -1,6 +1,5 @@
 import {Page} from "./page";
-import {buildMarkdown} from "./fragment";
-import {isPage} from "./utils";
+import {buildMarkdown, isPage} from "./utils";
 
 type PluginOptions = {
 	pages: Array<Page>

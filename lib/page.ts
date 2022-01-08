@@ -1,5 +1,5 @@
-import {FragmentsContainer, FragmentsContainerEntry, FragmentsList, SimpleFragmentsContainer} from "./fragment";
-import {Heading} from "./fragment/builtin";
+import {FragmentsContainer, FragmentsContainerEntry, FragmentsList, SimpleFragmentsContainer} from "./container";
+import {Heading} from "./fragment";
 
 export interface Page extends FragmentsContainer
 {
