@@ -1,5 +1,6 @@
 export * from './fragment'
-export * from './fragment/builtin'
+export * from './fragment/vuepress'
+export * from './container'
 export * from './page'
 
 import plugin from './plugin';
