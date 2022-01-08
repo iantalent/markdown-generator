@@ -1,31 +1,27 @@
-import {FragmentsContainer, FragmentsContainerEntry, FragmentsList, SimpleFragmentsContainer} from "./container";
+import {RootContainer} from "./container";
 import {Heading} from "./fragment";
 
-export interface Page extends FragmentsContainer
+export interface Page
 {
 	path(): string
 	
 	frontmatter(): any
+	
+	tree() : RootContainer
 }
 
 export class SimplePage implements Page
 {
-	private readonly $container = new SimpleFragmentsContainer();
+	private readonly $container = new RootContainer();
 	
 	constructor(private readonly $name: string, private readonly $path: string, private readonly $frontmatter = {})
 	{
 		this.$container.add(new Heading(this.$name, 1));
 	}
 	
-	tree(): FragmentsList
+	tree(): RootContainer
 	{
-		return this.$container.tree();
-	}
-	
-	add(entry: FragmentsContainerEntry)
-	{
-		this.$container.add(entry);
-		return this;
+		return this.$container;
 	}
 	
 	name(): string
@@ -42,5 +38,4 @@ export class SimplePage implements Page
 	{
 		return this.$frontmatter;
 	}
-	
 }

@@ -1,26 +1,28 @@
-import {Page} from "./page";
 import {FragmentsContainer, SimpleFragmentsContainer} from "./container";
 import {getTypeOrFunctionValue} from "./type";
+import {Page} from "./page";
 
 export function isFragmentsContainer(pretender: any): pretender is FragmentsContainer
 {
-	return typeof pretender['tree'] === 'function';
+	return typeof pretender['tree'] === 'function' && ['string', 'function'].indexOf(typeof pretender['separator']) !== -1;
 }
 
 export function isPage(pretender: any): pretender is Page
 {
 	return typeof pretender['path'] === 'function' &&
 		typeof pretender['frontmatter'] === 'function' &&
-		isFragmentsContainer(pretender);
+		typeof pretender['tree'] === 'function';
 }
 
-
 /**
- * @param {FragmentsContainer} container
+ * @param {FragmentsContainer|Page} container
  * @returns {string}
  */
-export function buildMarkdown(container: FragmentsContainer): string
+export function buildMarkdown(container: FragmentsContainer | Page): string
 {
+	if(isPage(container))
+		container = container.tree();
+	
 	return container.tree().map(entry =>
 	{
 		if(typeof entry === 'string')

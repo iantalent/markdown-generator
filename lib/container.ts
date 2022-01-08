@@ -17,16 +17,16 @@ export class SimpleFragmentsContainer implements FragmentsContainer
 {
 	private readonly $fragments: FragmentsList = [];
 	
-	constructor(private readonly $separator: string = "\r\n")
+	constructor(private readonly $separator: string = "")
 	{
 	}
 	
 	/**
 	 *
-	 * @param {FragmentsContainerEntry[]} fragments
+	 * @param {Array<FragmentsContainerEntry>} fragments
 	 * @returns {this}
 	 */
-	add(...fragments: Array<FragmentsContainerEntry>)
+	add(...fragments: Array<FragmentsContainerEntry>): this
 	{
 		if(fragments && fragments.length)
 		{
@@ -44,6 +44,14 @@ export class SimpleFragmentsContainer implements FragmentsContainer
 	separator()
 	{
 		return this.$separator;
+	}
+}
+
+export class RootContainer extends SimpleFragmentsContainer
+{
+	constructor()
+	{
+		super("\r\n");
 	}
 }
 
