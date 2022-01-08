@@ -1,4 +1,7 @@
-export type FragmentContent = (() => string) | string;
+import {TypeOrFunction} from "./type";
+
+export type FragmentContent = TypeOrFunction<string>;
+
 import {WrappedFragment, WrappedFragmentContent} from "./fragment/common";
 
 export interface Fragment
