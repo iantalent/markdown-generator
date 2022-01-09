@@ -20,6 +20,7 @@
 	},
 	"homepage": "https://github.com/iantalent/vuepress-plugin-custom-pages#readme",
 	"devDependencies": {
-		"typescript": "^4.5.4"
+		"typescript": "^4.5.4",
+		"vuepress": "^1.5.3"
 	}
 }

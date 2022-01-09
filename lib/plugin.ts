@@ -1,8 +1,10 @@
 import {Page} from "./page";
 import {buildMarkdown, isPage} from "./utils";
+import {Context} from '@vuepress/types'
 
 type PluginOptions = {
-	pages: Array<Page>
+	pages: Array<Page>,
+	entities: boolean
 }
 
 type AdditionalPages = {
@@ -11,9 +13,14 @@ type AdditionalPages = {
 	frontmatter: any
 }
 
-export default (options: PluginOptions, ctx: object) =>
+export default (options: PluginOptions, ctx: Context) =>
 {
 	const pages: Array<AdditionalPages> = [];
+	
+	if(options.entities === true)
+	{
+		console.log(ctx.sourceDir);
+	}
 	
 	if(Array.isArray(options['pages']) && options.pages.length)
 	{
