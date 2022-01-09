@@ -3,4 +3,6 @@ export * from './fragment/vuepress'
 export * from './container'
 export * from './page'
 
-export {default as plugin} from './plugin';
+import pluginFunc from './plugin';
+
+export {pluginFunc as plugin};
