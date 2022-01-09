@@ -1,7 +1,6 @@
 import {Page} from "./page";
 import {buildMarkdown, isPage} from "./utils";
 import {Context} from '@vuepress/types';
-import glob from 'glob';
 
 type PluginOptions = {
 	pages: Array<Page>,
@@ -16,11 +15,12 @@ type AdditionalPages = {
 
 export default (options: PluginOptions, ctx: Context) =>
 {
+	const glob = require('glob');
 	const pages: Array<AdditionalPages> = [];
 	
 	if(options.entities === true)
 	{
-		glob(ctx.sourceDir + "/**/*.entity.json", {}, (err, matches) =>
+		glob(ctx.sourceDir + "/**/*.entity.json", {}, (err: any, matches: Array<any>) =>
 		{
 			console.log(matches);
 		})
