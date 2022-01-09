@@ -21,6 +21,7 @@ export default (options: PluginOptions, ctx: Context) =>
 	
 	if(options.entities === true)
 	{
+		console.log('search in ' + ctx.sourceDir);
 		glob(ctx.sourceDir + "/**/*.entity.json", {}, (err: any, matches: Array<any>) =>
 		{
 			console.log(matches);
