@@ -1,6 +1,7 @@
 import {Page} from "./page";
 import {buildMarkdown, isPage} from "./utils";
-import {Context} from '@vuepress/types'
+import {Context} from '@vuepress/types';
+import glob from 'glob';
 
 type PluginOptions = {
 	pages: Array<Page>,
@@ -19,7 +20,10 @@ export default (options: PluginOptions, ctx: Context) =>
 	
 	if(options.entities === true)
 	{
-		console.log(ctx.sourceDir);
+		glob(ctx.sourceDir + "/**/*.entity.json", {}, (err, matches) =>
+		{
+			console.log(matches);
+		})
 	}
 	
 	if(Array.isArray(options['pages']) && options.pages.length)
