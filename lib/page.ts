@@ -1,27 +1,35 @@
-import {RootContainer} from "./container";
+import {FragmentsContainer, FragmentsList} from "./container";
 import {Heading} from "./fragment";
 
-export interface Page
+export interface Page extends FragmentsContainer
 {
 	path(): string
 	
 	frontmatter(): any
-	
-	tree(): RootContainer
 }
 
 export class SimplePage implements Page
 {
-	private readonly $container = new RootContainer();
+	private readonly fragments: FragmentsList = [];
 	
 	constructor(private readonly $name: string, private readonly $path: string, private readonly $frontmatter = {})
 	{
-		this.$container.add(new Heading(this.$name, 1));
+		this.fragments.push(new Heading(this.$name, 1));
 	}
 	
-	tree(): RootContainer
+	tree(): FragmentsList
 	{
-		return this.$container;
+		return this.fragments;
+	}
+	
+	add(...entries: FragmentsList): this
+	{
+		if(entries && entries.length)
+		{
+			for(const entry of entries)
+				this.fragments.push(entry);
+		}
+		return this;
 	}
 	
 	name(): string

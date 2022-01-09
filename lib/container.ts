@@ -9,11 +9,14 @@ export type FragmentsList = Array<FragmentsContainerEntry>;
 export interface FragmentsContainer
 {
 	tree(): FragmentsList
-	
+}
+
+export interface SeparatedFragmentsContainer extends FragmentsContainer
+{
 	separator: TypeOrFunction<string>
 }
 
-export class SimpleFragmentsContainer implements FragmentsContainer
+export class SimpleFragmentsContainer implements SeparatedFragmentsContainer
 {
 	private readonly $fragments: FragmentsList = [];
 	
@@ -47,7 +50,7 @@ export class SimpleFragmentsContainer implements FragmentsContainer
 	}
 }
 
-export class RootContainer extends SimpleFragmentsContainer
+export class ThroughLineContainer extends SimpleFragmentsContainer
 {
 	constructor()
 	{
@@ -55,7 +58,7 @@ export class RootContainer extends SimpleFragmentsContainer
 	}
 }
 
-export class InlineFragmentsContainer extends SimpleFragmentsContainer
+export class LineFragmentsContainer extends SimpleFragmentsContainer
 {
 	constructor()
 	{
