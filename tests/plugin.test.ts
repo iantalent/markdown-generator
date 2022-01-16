@@ -1,6 +1,7 @@
 import { suite, test } from '@testdeck/mocha';
 import * as chai from 'chai';
-import {plugin, SimplePage, } from "../lib";
+import {plugin, SimpleFragment, SimplePage, Tip,} from "../lib";
+import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
 
@@ -13,7 +14,11 @@ const assert = chai.assert;
 	@test 'Simple Page'()
 	{
 		const page = new SimplePage("page title", "/path/");
-		
+		page.add(
+			new SimpleFragment('some page data'),
+			new Tip('You should go this way not that!')
+		);
+		console.log(buildMarkdown(page));
 	}
 	
 	@test 'should do something when call a method'() {

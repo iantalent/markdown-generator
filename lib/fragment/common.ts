@@ -4,7 +4,8 @@ export type WrappedFragmentContent = string | Fragment;
 
 export class WrappedFragment implements Fragment
 {
-	constructor(private readonly $content: WrappedFragmentContent, private readonly $before: string, private readonly $after: string)
+	constructor(private readonly $content: WrappedFragmentContent, private readonly $before: string,
+	            private readonly $after: string)
 	{
 	}
 	

@@ -9,6 +9,11 @@ export interface Fragment
 	content: FragmentContent
 }
 
+export interface BlankLinesFragment extends Fragment
+{
+	blankLines: TypeOrFunction<boolean>
+}
+
 export class SimpleFragment implements Fragment
 {
 	constructor(private readonly $content: string)
@@ -21,13 +26,14 @@ export class SimpleFragment implements Fragment
 	};
 }
 
-export class Heading extends WrappedFragment
+export class Heading extends WrappedFragment implements BlankLinesFragment
 {
-	
 	constructor(content: WrappedFragmentContent, level: number = 1)
 	{
 		super(content, '#'.repeat(level) + ' ', '');
 	}
+	
+	blankLines: boolean = true;
 }
 
 export class Bold extends WrappedFragment

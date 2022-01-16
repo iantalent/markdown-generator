@@ -1,7 +1,7 @@
 import {Page} from "./page";
 import {buildMarkdown, isPage} from "./utils";
 import {Context} from '@vuepress/types';
-import assert from 'assert';
+
 const glob = require('glob');
 
 type PluginOptions = {
