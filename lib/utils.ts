@@ -1,6 +1,7 @@
 import {FragmentsContainer, SeparatedFragmentsContainer, SimpleFragmentsContainer} from "./container";
 import {getTypeOrFunctionValue} from "./type";
 import {Page} from "./page";
+import {Fragment} from "./fragment";
 
 export function isFragmentsContainer(container: any): container is FragmentsContainer
 {
@@ -19,6 +20,11 @@ export function isPage(page: any): page is Page
 		isFragmentsContainer(page);
 }
 
+export function isFragment(fragment: any): fragment is Fragment
+{
+	return typeof fragment['content'] === 'function';
+}
+
 /**
  * @param {FragmentsContainer|Page} container
  * @returns {string}
@@ -28,7 +34,7 @@ export function buildMarkdown(container: FragmentsContainer | Page): string
 	let separator;
 	
 	if(isSeparatedFragmentsContainer(container))
-		separator = getTypeOrFunctionValue(container.separator);
+		separator = getTypeOrFunctionValue(container.separator, container);
 	else
 		separator = isPage(container) ? "\r\n" : '';
 	
@@ -40,8 +46,8 @@ export function buildMarkdown(container: FragmentsContainer | Page): string
 			return buildMarkdown((new SimpleFragmentsContainer()).add(entry));
 		else if(isFragmentsContainer(entry)) //FragmentsContainer
 			return buildMarkdown(entry);
-		else if(entry['content'])
-			return getTypeOrFunctionValue(entry.content);
+		else if(isFragment(entry))
+			return getTypeOrFunctionValue(entry.content, entry);
 		else
 			throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string');
 	}).filter(value => value).join(separator)
