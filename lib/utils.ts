@@ -27,7 +27,7 @@ export function isPage(page: any): page is Page
 
 export function isFragment(fragment: any): fragment is Fragment
 {
-	return typeof fragment['content'] === 'function';
+	return  ['string', 'function'].indexOf(typeof fragment['content']) !== -1;
 }
 
 function isBlockLevelFragment(fragment: any): fragment is BlockLevelFragment
@@ -60,9 +60,13 @@ export function buildMarkdown(container: FragmentsContainer | Page): string
 		{
 			const isBlockLevel = isBlockLevelFragment(entry) && getTypeOrFunctionValue(entry.blockLevel, entry),
 				after = isBlockLevel ? '\r\n' : '';
-			return getTypeOrFunctionValue(entry.content, entry) + after;
+			return after + getTypeOrFunctionValue(entry.content, entry) + after;
 		}
 		else
-			throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string');
+		{
+			console.log(entry);
+			throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);
+		}
+		
 	}).filter(value => value).join(separator)
 }

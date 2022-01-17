@@ -1,6 +1,6 @@
 import { suite, test } from '@testdeck/mocha';
 import * as chai from 'chai';
-import {plugin, SimpleFragment, SimplePage, Tip,} from "../lib";
+import {Paragraph, plugin, SimpleFragment, SimplePage, Tip,} from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
@@ -16,7 +16,8 @@ const assert = chai.assert;
 		const page = new SimplePage("page title", "/path/");
 		page.add(
 			new SimpleFragment('some page data'),
-			new Tip('You should go this way not that!')
+			new Tip('You should go this way not that!'),
+			new Paragraph('Some paragraph info')
 		);
 		console.log(buildMarkdown(page));
 	}
