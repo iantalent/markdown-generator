@@ -21,9 +21,9 @@ export class SimpleFragment implements Fragment
 }
 
 @blockLevelFragment
-export class Paragraph
+export class Paragraph implements Fragment
 {
-	constructor(private readonly content: string)
+	constructor(public readonly content: string)
 	{
 	}
 }
