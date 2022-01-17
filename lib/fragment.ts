@@ -1,39 +1,42 @@
 import {TypeOrFunction} from "./type";
+import {WrappedFragment, WrappedFragmentContent} from "./fragment/common";
 
 export type FragmentContent = TypeOrFunction<string>;
 
-import {WrappedFragment, WrappedFragmentContent} from "./fragment/common";
+export function blockLevelFragment(constructor: Function)
+{
+	constructor.prototype.blockLevel = true;
+}
 
 export interface Fragment
 {
 	content: FragmentContent
 }
 
-export interface BlankLinesFragment extends Fragment
-{
-	blankLines: TypeOrFunction<boolean>
-}
-
 export class SimpleFragment implements Fragment
 {
-	constructor(private readonly $content: string)
+	constructor(public readonly content: string)
 	{
 	}
-	
-	content()
-	{
-		return this.$content
-	};
 }
 
-export class Heading extends WrappedFragment implements BlankLinesFragment
+@blockLevelFragment
+export class Paragraph
+{
+	constructor(private readonly content: string)
+	{
+	}
+}
+
+@blockLevelFragment
+export class Heading extends WrappedFragment
 {
 	constructor(content: WrappedFragmentContent, level: number = 1)
 	{
 		super(content, '#'.repeat(level) + ' ', '');
 	}
 	
-	blankLines: boolean = true;
+	blockLevel: boolean = true;
 }
 
 export class Bold extends WrappedFragment

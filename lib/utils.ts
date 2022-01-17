@@ -1,8 +1,12 @@
 import {FragmentsContainer, SeparatedFragmentsContainer, SimpleFragmentsContainer} from "./container";
-import {getTypeOrFunctionValue} from "./type";
+import {getTypeOrFunctionValue, TypeOrFunction} from "./type";
 import {Page} from "./page";
-import {BlankLinesFragment, Fragment} from "./fragment";
-import {type} from "os";
+import {Fragment} from "./fragment";
+
+interface BlockLevelFragment extends Fragment
+{
+	blockLevel: TypeOrFunction<boolean>
+}
 
 export function isFragmentsContainer(container: any): container is FragmentsContainer
 {
@@ -26,9 +30,9 @@ export function isFragment(fragment: any): fragment is Fragment
 	return typeof fragment['content'] === 'function';
 }
 
-function isBlankLinesFragment(fragment: any): fragment is BlankLinesFragment
+function isBlockLevelFragment(fragment: any): fragment is BlockLevelFragment
 {
-	return ['boolean', 'function'].indexOf(typeof fragment['blankLines']) !== -1 &&  isFragment(fragment);
+	return ['boolean', 'function'].indexOf(typeof fragment['blockLevel']) !== -1 &&  isFragment(fragment);
 }
 
 /**
@@ -54,8 +58,8 @@ export function buildMarkdown(container: FragmentsContainer | Page): string
 			return buildMarkdown(entry);
 		else if(isFragment(entry))
 		{
-			const isBlankLines = isBlankLinesFragment(entry) && getTypeOrFunctionValue(entry.blankLines, entry),
-				after = isBlankLines ? '\r\n' : '';
+			const isBlockLevel = isBlockLevelFragment(entry) && getTypeOrFunctionValue(entry.blockLevel, entry),
+				after = isBlockLevel ? '\r\n' : '';
 			return getTypeOrFunctionValue(entry.content, entry) + after;
 		}
 		else
