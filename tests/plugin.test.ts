@@ -1,6 +1,6 @@
-import { suite, test } from '@testdeck/mocha';
+import {suite, test} from '@testdeck/mocha';
 import * as chai from 'chai';
-import {Paragraph, plugin, SimpleFragment, SimplePage, Tip,} from "../lib";
+import {Paragraph, SimpleFragment, SimplePage, Tip,} from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
@@ -20,6 +20,11 @@ const assert = chai.assert;
 			new Paragraph('Some paragraph info')
 		);
 		console.log(buildMarkdown(page));
+	}
+	
+	@test 'VuePress Builtin fragments'()
+	{
+		assert.equal(buildMarkdown([new Tip('Tip content')]), '::: tip\r\n\r\nTip content\r\n\r\n:::');
 	}
 	
 	@test 'should do something when call a method'() {
