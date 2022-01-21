@@ -1,4 +1,9 @@
-import {FragmentsContainer, SeparatedFragmentsContainer, SimpleFragmentsContainer} from "./container";
+import {
+	FragmentsContainer,
+	FragmentsContainerEntry,
+	SeparatedFragmentsContainer,
+	SimpleFragmentsContainer
+} from "./container";
 import {getTypeOrFunctionValue, TypeOrFunction} from "./type";
 import {Page} from "./page";
 import {Fragment} from "./fragment";
@@ -27,19 +32,26 @@ export function isPage(page: any): page is Page
 
 export function isFragment(fragment: any): fragment is Fragment
 {
-	return  ['string', 'function'].indexOf(typeof fragment['content']) !== -1;
+	return ['string', 'function'].indexOf(typeof fragment['content']) !== -1;
 }
 
 function isBlockLevelFragment(fragment: any): fragment is BlockLevelFragment
 {
-	return ['boolean', 'function'].indexOf(typeof fragment['blockLevel']) !== -1 &&  isFragment(fragment);
+	return ['boolean', 'function'].indexOf(typeof fragment['blockLevel']) !== -1 && isFragment(fragment);
+}
+
+function createContainerFromArray(array: Array<FragmentsContainerEntry>): FragmentsContainer
+{
+	return {
+		tree: () => array
+	}
 }
 
 /**
  * @param {FragmentsContainer|Page} container
  * @returns {string}
  */
-export function buildMarkdown(container: FragmentsContainer | Page): string
+export function buildMarkdown(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>): string
 {
 	let separator;
 	
@@ -47,6 +59,9 @@ export function buildMarkdown(container: FragmentsContainer | Page): string
 		separator = getTypeOrFunctionValue(container.separator, container);
 	else
 		separator = isPage(container) ? "\r\n" : '';
+	
+	if(Array.isArray(container))
+		container = createContainerFromArray(container);
 	
 	return container.tree().map(entry =>
 	{
