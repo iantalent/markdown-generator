@@ -1,4 +1,4 @@
-import {WrappedFragment, WrappedFragmentContent, WrappedNewLineFragment} from "./common";
+import {WrappedFragmentContent, WrappedNewLineFragment} from "./common";
 import {blockLevelFragment} from "../fragment";
 
 @blockLevelFragment
