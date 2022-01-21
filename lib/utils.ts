@@ -47,18 +47,16 @@ function createContainerFromArray(array: Array<FragmentsContainerEntry>): Fragme
 	}
 }
 
-/**
- * @param {FragmentsContainer|Page} container
- * @returns {string}
- */
-export function buildMarkdown(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>): string
+type BuildMarkdownState = {
+	first: boolean
+	blankLine: boolean,
+}
+
+function buildMarkdownContainer(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>,
+                                state: BuildMarkdownState = {first: true, blankLine: false}): string
 {
-	let separator;
-	
-	if(isSeparatedFragmentsContainer(container))
-		separator = getTypeOrFunctionValue(container.separator, container);
-	else
-		separator = isPage(container) ? "\r\n" : '';
+	let separator = isSeparatedFragmentsContainer(container) ?
+		getTypeOrFunctionValue(container.separator, container) : '';
 	
 	if(Array.isArray(container))
 		container = createContainerFromArray(container);
@@ -68,14 +66,19 @@ export function buildMarkdown(container: FragmentsContainer | Page | Array<Fragm
 		if(typeof entry === 'string')
 			return entry;
 		else if(Array.isArray(entry))
-			return buildMarkdown((new SimpleFragmentsContainer()).add(entry));
+			return buildMarkdownContainer((new SimpleFragmentsContainer()).add(entry), state);
 		else if(isFragmentsContainer(entry)) //FragmentsContainer
-			return buildMarkdown(entry);
+			return buildMarkdownContainer(entry, state);
 		else if(isFragment(entry))
 		{
 			const isBlockLevel = isBlockLevelFragment(entry) && getTypeOrFunctionValue(entry.blockLevel, entry),
+				before = isBlockLevel && !state.first && !state.blankLine ? '\r\n' : '',
 				after = isBlockLevel ? '\r\n' : '';
-			return after + getTypeOrFunctionValue(entry.content, entry) + after;
+			
+			state.first = false;
+			state.blankLine = isBlockLevel;
+			
+			return before + getTypeOrFunctionValue(entry.content, entry) + after;
 		}
 		else
 		{
@@ -84,4 +87,13 @@ export function buildMarkdown(container: FragmentsContainer | Page | Array<Fragm
 		}
 		
 	}).filter(value => value).join(separator)
+}
+
+/**
+ * @param {FragmentsContainer|Page} container
+ * @returns {string}
+ */
+export function buildMarkdown(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>): string
+{
+	return buildMarkdownContainer(container);
 }
