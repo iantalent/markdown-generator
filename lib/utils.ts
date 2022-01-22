@@ -59,7 +59,7 @@ type BuildMarkdownState = {
 	 */
 	needBlankLine: boolean,
 	/**
-	 * current prefixes
+	 * prefixes for lines
 	 */
 	linePrefixes: Array<string>
 }
@@ -95,6 +95,13 @@ function processFragmentContent(fragment: Fragment, state: BuildMarkdownState): 
 	throw new Error('Fragment content can be only string, fragment or Array of strings or fragments');
 }
 
+function prefixLines(content: string, prefixes: Array<string>): string
+{
+	const joinedPrefixes = prefixes.join('');
+	console.log('start debug', content, prefixes, content.split('\r\n'), content.split('\r\n').map(line => joinedPrefixes + ' ' + line).join('\r\n'), 'end debug');
+	return content.split('\r\n').map(line => joinedPrefixes + ' ' + line).join('\r\n');
+}
+
 function buildMarkdownContainer(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>, state: BuildMarkdownState): string
 {
 	let separator = isSeparatedFragmentsContainer(container) ?
@@ -123,12 +130,15 @@ function buildMarkdownContainer(container: FragmentsContainer | Page | Array<Fra
 			if(isLinePrefix)
 				state.linePrefixes.push(getTypeOrFunctionValue(entry.linePrefix, entry));
 			
-			const result = before + processFragmentContent(entry, state);
+			let result = processFragmentContent(entry, state);
+			
+			if(state.linePrefixes.length)
+				result = prefixLines(result, state.linePrefixes);
 			
 			if(isLinePrefix)
 				state.linePrefixes.pop();
 			
-			return result;
+			return before + result;
 		}
 		else
 			throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);

@@ -5,9 +5,12 @@ import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
 
-@suite class pageFragments {
+@suite
+class pageFragments
+{
 	
-	before() {
+	before()
+	{
 	
 	}
 	
@@ -34,6 +37,10 @@ const assert = chai.assert;
 	@test 'BlockQuote'()
 	{
 		assert.equal(buildMarkdown([new BlockQuote('Quote')]), '> Quote');
+		console.log(buildMarkdown([new BlockQuote(['Quote 1', new BlockQuote('Sub quote 2')])]));
+		assert.equal(buildMarkdown([new BlockQuote(['Quote', new BlockQuote('Sub quote')])]),
+			'> Quote\r\n\r\n>> Sub quote'
+		);
 	}
 	
 	@test 'VuePress Builtin fragments'()
