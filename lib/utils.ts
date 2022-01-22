@@ -6,7 +6,7 @@ import {
 } from "./container";
 import {getTypeOrFunctionValue} from "./type";
 import {Page} from "./page";
-import {BlockLevelFragment, Fragment, FragmentContent} from "./fragment";
+import {BlockLevelFragment, Fragment, FragmentContent, LinePrefixFragment} from "./fragment";
 
 export function isFragmentsContainer(container: any): container is FragmentsContainer
 {
@@ -35,6 +35,11 @@ export function isFragment(fragment: any): fragment is Fragment
 function isBlockLevelFragment(fragment: any): fragment is BlockLevelFragment
 {
 	return ['boolean', 'function'].indexOf(typeof fragment['blockLevel']) !== -1 && isFragment(fragment);
+}
+
+function isLinePrefixFragment(fragment: any): fragment is LinePrefixFragment
+{
+	return ['string', 'function'].indexOf(typeof fragment['linePrefix']) !== -1 && isFragment(fragment);
 }
 
 function createContainerFromArray(array: Array<FragmentsContainerEntry>): FragmentsContainer
@@ -107,6 +112,7 @@ function buildMarkdownContainer(container: FragmentsContainer | Page | Array<Fra
 			const isBlockLevel = isBlockLevelFragment(entry) && getTypeOrFunctionValue(entry.blockLevel, entry),
 				before = !state.firstFragment && (isBlockLevel || state.needBlankLine) ? '\r\n\r\n' : '';
 			
+			// TODO respect line prefixes
 			state.firstFragment = false;
 			state.needBlankLine = isBlockLevel;
 			

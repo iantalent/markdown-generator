@@ -8,14 +8,19 @@ export function blockLevelFragment(constructor: Function)
 	constructor.prototype.blockLevel = true;
 }
 
+export interface Fragment
+{
+	content: FragmentContent
+}
+
 export interface BlockLevelFragment extends Fragment
 {
 	blockLevel: TypeOrFunction<boolean>
 }
 
-export interface Fragment
+export interface LinePrefixFragment extends Fragment
 {
-	content: FragmentContent
+	linePrefix: TypeOrFunction<string>
 }
 
 export class SimpleFragment implements Fragment, BlockLevelFragment

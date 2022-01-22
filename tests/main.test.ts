@@ -35,7 +35,4 @@ const assert = chai.assert;
 	{
 		assert.equal(buildMarkdown([new Tip('Tip content')]), '::: tip\r\n\r\nTip content\r\n\r\n:::');
 	}
-	
-	
-	
 }
