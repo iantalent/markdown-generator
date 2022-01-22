@@ -1,28 +1,20 @@
-import {Fragment} from "../fragment";
-
-export type WrappedFragmentContent = string | Fragment;
+import {Fragment, FragmentContent} from "../fragment";
 
 export class WrappedFragment implements Fragment
 {
-	constructor(private readonly $content: WrappedFragmentContent, private readonly $before: string,
-	            private readonly $after: string)
-	{
-	}
+	content: Array<FragmentContent>;
 	
-	content()
+	constructor(content: FragmentContent, before: string,
+	            after: string)
 	{
-		return this.$before + (
-			typeof this.$content === 'string' ?
-				this.$content :
-				(typeof this.$content.content === 'string' ? this.$content.content : this.$content.content())
-		) + this.$after;
+		this.content = [before, content, after]
 	}
 }
 
 export class WrappedNewLineFragment extends WrappedFragment
 {
-	constructor(content: WrappedFragmentContent, before: string, after: string)
+	constructor(content: FragmentContent, before: string, after: string)
 	{
-		super(content, before + "\r\n", "\r\n" + after);
+		super(content, before + "\r\n\r\n", "\r\n\r\n" + after);
 	}
 }
