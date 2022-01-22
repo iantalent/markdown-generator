@@ -1,6 +1,6 @@
 import {suite, test} from '@testdeck/mocha';
 import * as chai from 'chai';
-import {Bold, Code, Italic, Paragraph, SimpleFragment, SimplePage, Tip,} from "../lib";
+import {BlockQuote, Bold, Code, Italic, Paragraph, SimpleFragment, SimplePage, Tip,} from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
@@ -29,6 +29,11 @@ const assert = chai.assert;
 			'`Boolean`\r\n\r\n' +
 			'::: tip\r\n\r\nYou should go this way not that!\r\n\r\n:::\r\n\r\n' +
 			'Some paragraph info');
+	}
+	
+	@test 'BlockQuote'()
+	{
+		assert.equal(buildMarkdown([new BlockQuote('Quote')]), '> Quote');
 	}
 	
 	@test 'VuePress Builtin fragments'()

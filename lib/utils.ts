@@ -58,9 +58,13 @@ type BuildMarkdownState = {
 	 * is blank line required ?
 	 */
 	needBlankLine: boolean,
+	/**
+	 * current prefixes
+	 */
+	linePrefixes: Array<string>
 }
 
-function processFragmentArrayContent(contentArray: Array<FragmentContent>): string
+function processFragmentArrayContent(contentArray: Array<FragmentContent>, state: BuildMarkdownState): string
 {
 	const parts: Array<string> = [];
 	for(const contentItem of contentArray)
@@ -68,14 +72,14 @@ function processFragmentArrayContent(contentArray: Array<FragmentContent>): stri
 		if(typeof contentItem === 'string')
 			parts.push(contentItem);
 		else if(Array.isArray(contentItem))
-			parts.push(processFragmentArrayContent(contentItem));
+			parts.push(processFragmentArrayContent(contentItem, state));
 		else if(isFragment(contentItem))
-			parts.push(processFragmentContent(contentItem));
+			parts.push(processFragmentContent(contentItem, state));
 	}
 	return parts.join('');
 }
 
-function processFragmentContent(fragment: Fragment): string
+function processFragmentContent(fragment: Fragment, state: BuildMarkdownState): string
 {
 	const content = getTypeOrFunctionValue(fragment.content, fragment);
 	
@@ -83,10 +87,10 @@ function processFragmentContent(fragment: Fragment): string
 		return content;
 	
 	if(Array.isArray(content))
-		return processFragmentArrayContent(content);
+		return processFragmentArrayContent(content, state);
 	
 	if(isFragment(content))
-		return processFragmentContent(content);
+		return processFragmentContent(content, state);
 	
 	throw new Error('Fragment content can be only string, fragment or Array of strings or fragments');
 }
@@ -110,13 +114,21 @@ function buildMarkdownContainer(container: FragmentsContainer | Page | Array<Fra
 		else if(isFragment(entry))
 		{
 			const isBlockLevel = isBlockLevelFragment(entry) && getTypeOrFunctionValue(entry.blockLevel, entry),
-				before = !state.firstFragment && (isBlockLevel || state.needBlankLine) ? '\r\n\r\n' : '';
+				before = !state.firstFragment && (isBlockLevel || state.needBlankLine) ? '\r\n\r\n' : '',
+				isLinePrefix = isLinePrefixFragment(entry);
 			
-			// TODO respect line prefixes
 			state.firstFragment = false;
 			state.needBlankLine = isBlockLevel;
 			
-			return before + processFragmentContent(entry);
+			if(isLinePrefix)
+				state.linePrefixes.push(getTypeOrFunctionValue(entry.linePrefix, entry));
+			
+			const result = before + processFragmentContent(entry, state);
+			
+			if(isLinePrefix)
+				state.linePrefixes.pop();
+			
+			return result;
 		}
 		else
 			throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);
@@ -132,6 +144,7 @@ export function buildMarkdown(container: FragmentsContainer | Page | Array<Fragm
 {
 	return buildMarkdownContainer(container, {
 		firstFragment: true,
-		needBlankLine: false
+		needBlankLine: false,
+		linePrefixes: []
 	});
 }

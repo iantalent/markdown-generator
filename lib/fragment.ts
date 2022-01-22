@@ -93,3 +93,13 @@ export class Link implements Fragment
 		return `[${this.name}](${this.link})`;
 	}
 }
+
+@blockLevelFragment
+export class BlockQuote implements LinePrefixFragment
+{
+	linePrefix: string = '>';
+	
+	constructor(public readonly content: FragmentContent)
+	{
+	}
+}
