@@ -4,14 +4,9 @@ import {
 	SeparatedFragmentsContainer,
 	SimpleFragmentsContainer
 } from "./container";
-import {getTypeOrFunctionValue, TypeOrFunction} from "./type";
+import {getTypeOrFunctionValue} from "./type";
 import {Page} from "./page";
-import {Fragment} from "./fragment";
-
-interface BlockLevelFragment extends Fragment
-{
-	blockLevel: TypeOrFunction<boolean>
-}
+import {BlockLevelFragment, Fragment, FragmentContent} from "./fragment";
 
 export function isFragmentsContainer(container: any): container is FragmentsContainer
 {
@@ -32,7 +27,9 @@ export function isPage(page: any): page is Page
 
 export function isFragment(fragment: any): fragment is Fragment
 {
-	return ['string', 'function'].indexOf(typeof fragment['content']) !== -1;
+	return ['string', 'function'].indexOf(typeof fragment['content']) !== -1 ||
+		Array.isArray(fragment['content'])
+		|| isFragment(fragment['content']);
 }
 
 function isBlockLevelFragment(fragment: any): fragment is BlockLevelFragment
@@ -48,12 +45,48 @@ function createContainerFromArray(array: Array<FragmentsContainerEntry>): Fragme
 }
 
 type BuildMarkdownState = {
-	first: boolean
-	blankLine: boolean,
+	/**
+	 * is firstFragment fragment processing ?
+	 */
+	firstFragment: boolean
+	/**
+	 * is blank line required ?
+	 */
+	needBlankLine: boolean,
 }
 
-function buildMarkdownContainer(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>,
-                                state: BuildMarkdownState = {first: true, blankLine: false}): string
+function processFragmentArrayContent(contentArray: Array<FragmentContent>): string
+{
+	const parts: Array<string> = [];
+	for(const contentItem of contentArray)
+	{
+		if(typeof contentItem === 'string')
+			parts.push(contentItem);
+		else if(Array.isArray(contentItem))
+			parts.push(processFragmentArrayContent(contentItem));
+		else if(isFragment(contentItem))
+			parts.push(processFragmentContent(contentItem));
+	}
+	return parts.join('');
+}
+
+function processFragmentContent(fragment: Fragment): string
+{
+	const content = getTypeOrFunctionValue(fragment.content, fragment);
+	
+	if(typeof content === 'string')
+		return content;
+	
+	if(Array.isArray(content))
+		return processFragmentArrayContent(content);
+	
+	if(isFragment(content))
+		return processFragmentContent(content);
+	
+	throw new Error('Fragment content can be only string, fragment or Array of strings or fragments');
+}
+
+function buildMarkdownContainer(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>, state: BuildMarkdownState): string
 {
 	let separator = isSeparatedFragmentsContainer(container) ?
 		getTypeOrFunctionValue(container.separator, container) : '';
@@ -72,19 +105,15 @@ function buildMarkdownContainer(container: FragmentsContainer | Page | Array<Fra
 		else if(isFragment(entry))
 		{
 			const isBlockLevel = isBlockLevelFragment(entry) && getTypeOrFunctionValue(entry.blockLevel, entry),
-				before = isBlockLevel && !state.first && !state.blankLine ? '\r\n' : '',
-				after = isBlockLevel ? '\r\n' : '';
+				before = !state.firstFragment && (isBlockLevel || state.needBlankLine) ? '\r\n\r\n' : '';
 			
-			state.first = false;
-			state.blankLine = isBlockLevel;
+			state.firstFragment = false;
+			state.needBlankLine = isBlockLevel;
 			
-			return before + getTypeOrFunctionValue(entry.content, entry) + after;
+			return before + processFragmentContent(entry);
 		}
 		else
-		{
-			console.log(entry);
 			throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);
-		}
 		
 	}).filter(value => value).join(separator)
 }
@@ -95,5 +124,8 @@ function buildMarkdownContainer(container: FragmentsContainer | Page | Array<Fra
  */
 export function buildMarkdown(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>): string
 {
-	return buildMarkdownContainer(container);
+	return buildMarkdownContainer(container, {
+		firstFragment: true,
+		needBlankLine: false
+	});
 }
