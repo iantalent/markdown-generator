@@ -33,6 +33,29 @@ function isLinePrefixFragment(fragment: any): fragment is LinePrefixFragment
 	return ['string', 'function'].indexOf(typeof fragment['linePrefix']) !== -1 && isFragment(fragment);
 }
 
+function mergeArrays<T>(array: Array<T>, arrays: Array<T>)
+{
+	if(!arrays.length)
+		return;
+	
+	for(const value of arrays)
+		array.push(value);
+}
+
+class MarkdownLine
+{
+	needBlankLineBefore: boolean = false;
+	needBlankLineAfter: boolean = false;
+	prefixes: Array<string> = [];
+	indent: number = 0;
+	isBlank: boolean;
+	
+	constructor(public readonly content: string)
+	{
+		this.isBlank = !content.trim().length;
+	}
+}
+
 export class MarkdownBuilder
 {
 	
@@ -45,6 +68,11 @@ export class MarkdownBuilder
 	{
 	}
 	
+	static build(container: Container)
+	{
+		return (new MarkdownBuilder(container)).build();
+	}
+	
 	private build(): string
 	{
 		return this.buildContainer(this.rootContainer);
@@ -52,20 +80,49 @@ export class MarkdownBuilder
 	
 	private buildContainer(container: Container): string
 	{
+		const lines = this.buildLines(container);
+		let content = '';
+		if(lines.length)
+		{
+			for(let index = 0; index < lines.length; index++)
+			{
+				const line = lines[index];
+				if(line.needBlankLineBefore && index > 0 && !lines[index - 1].isBlank)
+					content += '\r\n';
+				
+				let lineContent = line.content;
+				
+				if(line.indent)
+					lineContent = '    '.repeat(line.indent) + lineContent;
+				
+				if(line.prefixes.length)
+					lineContent = line.prefixes.join('') + ' ' + lineContent;
+				
+				if(line.needBlankLineAfter && index + 1 < lines.length && !lines[index + 1].isBlank)
+					content += '\r\n';
+			}
+		}
+		return content;
+	}
+	
+	private buildLines(container: Container): Array<MarkdownLine>
+	{
 		const separator = isSeparatedFragmentsContainer(container) ?
 			getTypeOrFunctionValue(container.separator, container) : '';
 		
 		if(Array.isArray(container))
 			container = createContainerFromArray(container);
 		
-		return container.tree().map(entry =>
+		const lines: Array<MarkdownLine> = [];
+		
+		container.tree().forEach(entry =>
 		{
 			if(typeof entry === 'string')
 				return entry;
 			else if(Array.isArray(entry))
-				return this.buildContainer((new SimpleFragmentsContainer()).add(entry));
+				mergeArrays(lines, this.buildLines((new SimpleFragmentsContainer()).add(entry)));
 			else if(isFragmentsContainer(entry))
-				return this.buildContainer(entry);
+				mergeArrays(lines, this.buildLines(entry));
 			else if(isFragment(entry))
 			{
 				const isBlockLevel = isBlockLevelFragment(entry) && getTypeOrFunctionValue(entry.blockLevel, entry),
@@ -75,7 +132,7 @@ export class MarkdownBuilder
 				if(isLinePrefix)
 					this.linePrefixes.push(getTypeOrFunctionValue(entry.linePrefix, entry));
 				
-				let result = this.processFragmentContent(entry);
+				let entryLines = this.getFragmentLines(entry);
 				
 				this.isFirstFragment = false;
 				this.requiredBlankLines = isBlockLevel;
@@ -86,18 +143,24 @@ export class MarkdownBuilder
 				if(isLinePrefix)
 					this.linePrefixes.pop();
 				
-				return before + result;
+				return entryLines;
 			}
 			else
 				throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);
-			
-		}).filter(value => value).join(separator)
+		});
+		
+		return lines;
+	}
+	
+	getFragmentLines(fragment: Fragment): Array<MarkdownLine>
+	{
+	
 	}
 	
 	prefixLines(content: string): string
 	{
 		const prefixes = this.linePrefixes.join('');
-		return content.split('\r\n').map(line => prefixes + ' ' +  line).join('\r\n');
+		return content.split('\r\n').map(line => prefixes + ' ' + line).join('\r\n');
 	}
 	
 	processFragmentArrayContent(contentArray: Array<FragmentContent>): string
@@ -129,10 +192,5 @@ export class MarkdownBuilder
 			return this.processFragmentContent(content);
 		
 		throw new Error('Fragment content can be only string, fragment or Array of strings or fragments');
-	}
-	
-	static build(container: Container)
-	{
-		return (new MarkdownBuilder(container)).build();
 	}
 }
