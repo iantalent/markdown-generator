@@ -37,9 +37,8 @@ class pageFragments
 	@test 'BlockQuote'()
 	{
 		assert.equal(buildMarkdown([new BlockQuote('Quote')]), '> Quote');
-		console.log(buildMarkdown([new BlockQuote(['Quote 1', new BlockQuote('Sub quote 2')])]));
 		assert.equal(buildMarkdown([new BlockQuote(['Quote', new BlockQuote('Sub quote')])]),
-			'> Quote\r\n\r\n>> Sub quote'
+			'> Quote\r\n>\r\n>> Sub quote'
 		);
 	}
 	
