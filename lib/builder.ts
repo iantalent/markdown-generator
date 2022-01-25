@@ -33,41 +33,6 @@ function isLinePrefixFragment(fragment: any): fragment is LinePrefixFragment
 	return ['string', 'function'].indexOf(typeof fragment['linePrefix']) !== -1 && isFragment(fragment);
 }
 
-function mergeLines(lines: Array<MarkdownLine>, moreLines: Array<MarkdownLine>)
-{
-	if(!moreLines.length)
-		return;
-	
-	for(const value of moreLines)
-		lines.push(value);
-}
-
-function buildLinesFromContent(content: string)
-{
-	return content.split('\r\n').map(lineContent =>
-	{
-		const line = new MarkdownLine(lineContent);
-		line.virtual = false;
-		return line;
-	});
-}
-
-class MarkdownLine
-{
-	public needBlankLineBefore: boolean = false;
-	public needBlankLineAfter: boolean = false;
-	public blockLevelLine: boolean = false;
-	public readonly prefixes: Array<string> = [];
-	public indent: number = 0;
-	public virtual: boolean = true;
-	public readonly isBlank: boolean;
-	
-	constructor(public readonly content: string)
-	{
-		this.isBlank = !content.trim().length;
-	}
-}
-
 class FragmentResult
 {
 	public blockLevel: boolean = false;
@@ -87,7 +52,8 @@ class FragmentResult
 	}
 }
 
-enum RequireBlankLineState{
+enum RequireBlankLineState
+{
 	NONE,
 	NEXT_BLOCK_LEVEL,
 	NEXT_ANY
@@ -96,12 +62,12 @@ enum RequireBlankLineState{
 type builderState = {
 	isFirstLine: boolean,
 	requireBlankLine: RequireBlankLineState,
-	blankLinePrefixes: Array<string>;
+	linePrefixes: Array<string>;
 };
 
 export class MarkdownBuilder
 {
-	
+	// TODO move this properties to state object (as like buildFragmentsResults)
 	private isFirstFragment: boolean = true;
 	private linePrefixes: Array<string> = [];
 	private lineIdent: number = 0;
@@ -127,7 +93,7 @@ export class MarkdownBuilder
 	private buildFragmentsResults(results: Array<FragmentResult>, state: builderState = {
 		isFirstLine: true,
 		requireBlankLine: RequireBlankLineState.NONE,
-		blankLinePrefixes: []
+		linePrefixes: [] // Todo line prefixes interface for lazy and once calculation of full prefixes
 	}): string
 	{
 		return results.map(entry =>
@@ -135,7 +101,17 @@ export class MarkdownBuilder
 			let result = entry.content,
 				resultPrefixes = '',
 				prependLineBreak = false,
-				prevPrefixes = state.blankLinePrefixes;
+				prevPrefixes = state.linePrefixes;
+			
+			if(state.linePrefixes.length && result && result.match(/\r?\n/g))
+			{
+				const newLinesPrefixes = state.linePrefixes.join('');
+				result = result.split(/\r?\n/g).map((line, index) =>
+				{
+					return index === 0 ? line : (newLinesPrefixes + ' ' + line);
+					
+				}).join('\r\n');
+			}
 			
 			if(entry.blockLevel)
 			{
@@ -143,13 +119,13 @@ export class MarkdownBuilder
 					prependLineBreak = true;
 				
 				state.requireBlankLine = RequireBlankLineState.NEXT_BLOCK_LEVEL;
-				state.blankLinePrefixes = [...entry.prefixes];
+				state.linePrefixes = [...entry.prefixes];
 			}
 			else if(state.requireBlankLine === RequireBlankLineState.NEXT_ANY)
 			{
 				prependLineBreak = true;
 				state.requireBlankLine = RequireBlankLineState.NONE;
-				state.blankLinePrefixes = prevPrefixes;
+				state.linePrefixes = prevPrefixes;
 			}
 			
 			if(prependLineBreak)
@@ -166,7 +142,7 @@ export class MarkdownBuilder
 			if(entry.blockLevel)
 			{
 				state.requireBlankLine = RequireBlankLineState.NEXT_ANY;
-				state.blankLinePrefixes = prevPrefixes;
+				state.linePrefixes = prevPrefixes;
 			}
 			
 			return resultPrefixes + result;
