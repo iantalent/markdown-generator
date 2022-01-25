@@ -8,3 +8,4 @@
 - [ ] Superscript
 - [ ] Definition Lists
 - [ ] Footnotes
+- [ ] Support SeparatedFragmentsContainer
