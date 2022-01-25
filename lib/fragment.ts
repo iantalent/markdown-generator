@@ -73,6 +73,14 @@ export class BoldItalic extends WrappedFragment
 	}
 }
 
+export class Strikethrough extends WrappedFragment
+{
+	constructor(content: FragmentContent)
+	{
+		super(content, '~~', '~~');
+	}
+}
+
 export class Code extends WrappedFragment
 {
 	constructor(content: FragmentContent)

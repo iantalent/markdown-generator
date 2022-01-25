@@ -1,6 +1,17 @@
 import {suite, test} from '@testdeck/mocha';
 import * as chai from 'chai';
-import {BlockQuote, Bold, Code, CodeBlock, Italic, Paragraph, SimpleFragment, SimplePage, Tip,} from "../lib";
+import {
+	BlockQuote,
+	Bold,
+	Code,
+	CodeBlock,
+	Italic,
+	Paragraph,
+	SimpleFragment,
+	SimplePage,
+	Strikethrough,
+	Tip,
+} from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
@@ -58,6 +69,18 @@ class pageFragments
 		assert.equal(
 			buildMarkdown([new CodeBlock('var test = "lang";\r\nconsole.log(test);', 'js')]),
 			'```js\r\n\r\nvar test = "lang";\r\nconsole.log(test);\r\n\r\n```'
+		);
+	}
+	
+	@test 'Strikethrough'()
+	{
+		assert.equal(buildMarkdown([new Strikethrough('message')]), '~~message~~');
+		assert.equal(
+			buildMarkdown([
+				new Paragraph(new Strikethrough('message 1')),
+				new Paragraph(new Strikethrough('message 2')),
+			]),
+			'~~message 1~~\r\n\r\n~~message 2~~'
 		);
 	}
 	
