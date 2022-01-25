@@ -5,7 +5,7 @@ import {
 	Bold,
 	Code,
 	CodeBlock,
-	Italic,
+	Italic, Link,
 	Paragraph,
 	SimpleFragment,
 	SimplePage,
@@ -81,6 +81,22 @@ class pageFragments
 				new Paragraph(new StrikeThrough('message 2')),
 			]),
 			'~~message 1~~\r\n\r\n~~message 2~~'
+		);
+	}
+	
+	@test 'links'()
+	{
+		assert.equal(
+			buildMarkdown([new Link('/folder/index.php', 'link')]),
+			'[link](/folder/index.php)'
+		);
+		assert.equal(
+			buildMarkdown([new Link('/folder/index.php', ['text ', new Bold('link')])]),
+			'[text **link**](/folder/index.php)'
+		);
+		assert.equal(
+			buildMarkdown([new Italic(new Link('/folder/index.php', 'link'))]),
+			'*[link](/folder/index.php)*'
 		);
 	}
 	
