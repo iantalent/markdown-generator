@@ -73,7 +73,7 @@ export class BoldItalic extends WrappedFragment
 	}
 }
 
-export class Strikethrough extends WrappedFragment
+export class StrikeThrough extends WrappedFragment
 {
 	constructor(content: FragmentContent)
 	{

@@ -9,7 +9,7 @@ import {
 	Paragraph,
 	SimpleFragment,
 	SimplePage,
-	Strikethrough,
+	StrikeThrough,
 	Tip,
 } from "../lib";
 import {buildMarkdown} from "../lib/utils";
@@ -74,11 +74,11 @@ class pageFragments
 	
 	@test 'Strikethrough'()
 	{
-		assert.equal(buildMarkdown([new Strikethrough('message')]), '~~message~~');
+		assert.equal(buildMarkdown([new StrikeThrough('message')]), '~~message~~');
 		assert.equal(
 			buildMarkdown([
-				new Paragraph(new Strikethrough('message 1')),
-				new Paragraph(new Strikethrough('message 2')),
+				new Paragraph(new StrikeThrough('message 1')),
+				new Paragraph(new StrikeThrough('message 2')),
 			]),
 			'~~message 1~~\r\n\r\n~~message 2~~'
 		);
