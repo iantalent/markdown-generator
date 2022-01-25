@@ -100,13 +100,13 @@ export class CodeBlock extends WrappedNewLineFragment
 export class Link implements Fragment
 {
 	
-	constructor(private readonly name: string, private readonly link: string)
+	constructor(private readonly link: string, private readonly name: FragmentContent)
 	{
 	}
 	
 	content()
 	{
-		return `[${this.name}](${this.link})`;
+		return ['[', this.name, ']', `(${this.link})`];
 	}
 }
 
