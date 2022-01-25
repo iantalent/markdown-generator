@@ -166,7 +166,7 @@ export class MarkdownBuilder
 			if(entry.blockLevel)
 			{
 				state.requireBlankLine = RequireBlankLineState.NEXT_ANY;
-				state.blankLinePrefixes = [...entry.prefixes];
+				state.blankLinePrefixes = [];
 			}
 			
 			return resultPrefixes + result;

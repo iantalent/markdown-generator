@@ -25,6 +25,7 @@ class pageFragments
 			{content: 'Simple fragment'},
 			{content: 'Simple fragment 2'},
 			new Tip('You should go this way not that!'),
+			new BlockQuote(['quote 1', new BlockQuote(['quote 2', new BlockQuote('quote 3')])]),
 			new Paragraph('Some paragraph info')
 		);
 		assert.equal(buildMarkdown(page), '# title\r\n\r\n' +
@@ -34,6 +35,7 @@ class pageFragments
 			'`Boolean`\r\n\r\n' +
 			'Simple fragmentSimple fragment 2\r\n\r\n' +
 			'::: tip\r\n\r\nYou should go this way not that!\r\n\r\n:::\r\n\r\n' +
+			'> quote 1\r\n>\r\n>> quote 2\r\n>>\r\n>>> quote 3\r\n\r\n' +
 			'Some paragraph info');
 	}
 	
