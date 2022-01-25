@@ -87,9 +87,15 @@ class FragmentResult
 	}
 }
 
+enum RequireBlankLineState{
+	NONE,
+	NEXT_BLOCK_LEVEL,
+	NEXT_ANY
+}
+
 type builderState = {
 	isFirstLine: boolean,
-	requireBlankLine: boolean
+	requireBlankLine: RequireBlankLineState,
 };
 
 export class MarkdownBuilder
@@ -119,15 +125,30 @@ export class MarkdownBuilder
 	
 	private buildFragmentsResults(results: Array<FragmentResult>, state: builderState = {
 		isFirstLine: true,
-		requireBlankLine: false
+		requireBlankLine: RequireBlankLineState.NONE
 	}): string
 	{
 		return results.map(entry =>
 		{
 			let result = entry.content,
-				resultPrefixes = '';
+				resultPrefixes = '',
+				prependLineBreak = false;
 			
-			if(entry.blockLevel && !state.isFirstLine)
+			if(entry.blockLevel)
+			{
+				if(!state.isFirstLine || state.requireBlankLine !== RequireBlankLineState.NONE)
+					prependLineBreak = true;
+				
+				state.requireBlankLine = RequireBlankLineState.NEXT_BLOCK_LEVEL;
+			}
+			else if(state.requireBlankLine === RequireBlankLineState.NEXT_ANY)
+			{
+				prependLineBreak = true;
+				state.requireBlankLine = RequireBlankLineState.NONE;
+			}
+			
+			
+			if(prependLineBreak)
 				resultPrefixes += '\r\n\r\n';
 			
 			if(entry.prefixes.length)
@@ -137,6 +158,9 @@ export class MarkdownBuilder
 			
 			if(entry.results.length)
 				result += this.buildFragmentsResults(entry.results, state);
+			
+			if(entry.blockLevel)
+				state.requireBlankLine = RequireBlankLineState.NEXT_ANY;
 			
 			return resultPrefixes + result;
 		}).join('');

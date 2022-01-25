@@ -22,6 +22,8 @@ class pageFragments
 			new Paragraph(['Paragraph 1 ', new Bold('bold')]),
 			new Paragraph(new Italic('Italic text')),
 			new Paragraph(new Code('Boolean')),
+			{content: 'Simple fragment'},
+			{content: 'Simple fragment 2'},
 			new Tip('You should go this way not that!'),
 			new Paragraph('Some paragraph info')
 		);
@@ -30,6 +32,7 @@ class pageFragments
 			'Paragraph 1 **bold**\r\n\r\n' +
 			'*Italic text*\r\n\r\n' +
 			'`Boolean`\r\n\r\n' +
+			'Simple fragmentSimple fragment 2\r\n\r\n' +
 			'::: tip\r\n\r\nYou should go this way not that!\r\n\r\n:::\r\n\r\n' +
 			'Some paragraph info');
 	}
