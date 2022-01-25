@@ -149,7 +149,7 @@ export class MarkdownBuilder
 			{
 				prependLineBreak = true;
 				state.requireBlankLine = RequireBlankLineState.NONE;
-				state.blankLinePrefixes = [];
+				state.blankLinePrefixes = prevPrefixes;
 			}
 			
 			if(prependLineBreak)
@@ -166,7 +166,7 @@ export class MarkdownBuilder
 			if(entry.blockLevel)
 			{
 				state.requireBlankLine = RequireBlankLineState.NEXT_ANY;
-				state.blankLinePrefixes = [];
+				state.blankLinePrefixes = prevPrefixes;
 			}
 			
 			return resultPrefixes + result;
