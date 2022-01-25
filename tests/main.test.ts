@@ -62,6 +62,10 @@ class pageFragments
 		assert.equal(buildMarkdown([new BlockQuote(['Quote', new BlockQuote('Sub quote')])]),
 			'> Quote\r\n>\r\n>> Sub quote'
 		);
+		assert.equal(
+			buildMarkdown([new BlockQuote('content\r\nsub content')]),
+			'> content\r\n> sub content'
+		);
 	}
 	
 	@test 'CodeBlock'()
