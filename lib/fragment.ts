@@ -1,5 +1,5 @@
 import {TypeOrFunction} from "./type";
-import {WrappedFragment} from "./fragment/common";
+import {WrappedFragment, WrappedNewLineFragment} from "./fragment/common";
 
 export type FragmentContent = TypeOrFunction<string | Fragment | Array<FragmentContent>>;
 
@@ -78,6 +78,14 @@ export class Code extends WrappedFragment
 	constructor(content: FragmentContent)
 	{
 		super(content, '`', '`');
+	}
+}
+
+export class CodeBlock extends WrappedNewLineFragment
+{
+	constructor(code: string, language: string = '')
+	{
+		super(code, '```' + language, '```');
 	}
 }
 
