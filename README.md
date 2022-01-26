@@ -3,7 +3,7 @@
 - [ ] Table
 - [ ] Lists
 - [x] Emoji
-- [ ] Highlight
+- [x] Highlight
 - [ ] Subscript
 - [ ] Superscript
 - [ ] Definition Lists

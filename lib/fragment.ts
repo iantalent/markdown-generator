@@ -127,3 +127,11 @@ export class Emoji extends WrappedFragment
 		super(emojiCode, ':', ':');
 	}
 }
+
+export class Highlight extends WrappedFragment
+{
+	constructor(content: FragmentContent)
+	{
+		super(content, '==', '==');
+	}
+}

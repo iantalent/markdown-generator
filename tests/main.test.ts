@@ -4,7 +4,7 @@ import {
 	BlockQuote,
 	Bold,
 	Code,
-	CodeBlock, Emoji,
+	CodeBlock, Emoji, Highlight,
 	Italic, Link,
 	Paragraph,
 	SimpleFragment,
@@ -108,6 +108,11 @@ class pageFragments
 	{
 		assert.equal(buildMarkdown([new Emoji('joy')]), ':joy:');
 		assert.equal(buildMarkdown([new Emoji('tent')]), ':tent:');
+	}
+	
+	@test 'Highlight'()
+	{
+		assert.equal(buildMarkdown([new Highlight('highlighted content')]), '==highlighted content==');
 	}
 	
 	@test 'VuePress Builtin fragments'()
