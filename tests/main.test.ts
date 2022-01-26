@@ -9,7 +9,7 @@ import {
 	Paragraph,
 	SimpleFragment,
 	SimplePage,
-	StrikeThrough,
+	StrikeThrough, Subscript,
 	Tip,
 } from "../lib";
 import {buildMarkdown} from "../lib/utils";
@@ -113,6 +113,11 @@ class pageFragments
 	@test 'Highlight'()
 	{
 		assert.equal(buildMarkdown([new Highlight('highlighted content')]), '==highlighted content==');
+	}
+	
+	@test 'Subscript'()
+	{
+		assert.equal(buildMarkdown(['H', new Subscript('2'), 'O']), 'H~2~O');
 	}
 	
 	@test 'VuePress Builtin fragments'()

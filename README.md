@@ -4,7 +4,7 @@
 - [ ] Lists
 - [x] Emoji
 - [x] Highlight
-- [ ] Subscript
+- [x] Subscript
 - [ ] Superscript
 - [ ] Definition Lists
 - [ ] Footnotes

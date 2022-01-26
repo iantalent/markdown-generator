@@ -135,3 +135,11 @@ export class Highlight extends WrappedFragment
 		super(content, '==', '==');
 	}
 }
+
+export class Subscript extends WrappedFragment
+{
+	constructor(content: FragmentContent)
+	{
+		super(content, '~', '~');
+	}
+}
