@@ -1,5 +1,6 @@
 import {TypeOrFunction} from "./type";
 import {WrappedFragment, WrappedNewLineFragment} from "./fragment/common";
+import Ordered = Chai.Ordered;
 
 export type FragmentContent = (() => FragmentContent) | TypeOrFunction<string | Fragment | Array<FragmentContent>>;
 
@@ -162,10 +163,6 @@ export abstract class List implements IndentFragment
 	indent: true = true;
 	private items: Array<FragmentContent> = [];
 	
-	constructor()
-	{
-	}
-	
 	add(...items: Array<FragmentContent>)
 	{
 		if(items.length)
@@ -181,6 +178,55 @@ export abstract class List implements IndentFragment
 		return this.items.map((item, index) =>
 		{
 			return [(index > 0 ? '\r\n' : ''), this.prefix(item, index), ' ', item];
+		});
+	}
+}
+
+export class OrderedList extends List
+{
+	protected prefix(item: FragmentContent, index: number): string
+	{
+		return (index + 1) + '.';
+	}
+}
+
+export class UnorderedList extends List
+{
+	protected prefix(item: FragmentContent, index: number): string
+	{
+		return "-";
+	}
+}
+
+type TodoListItem = {
+	state: boolean,
+	content: FragmentContent
+};
+
+export class TodoList implements IndentFragment
+{
+	indent: true = true;
+	private items: Array<TodoListItem> = [];
+	
+	add(state: boolean, ...items: Array<FragmentContent>)
+	{
+		if(items.length)
+		{
+			for(const item of items)
+				this.items.push({
+					state: state,
+					content: item
+				});
+		}
+		
+		return this;
+	}
+	
+	content(): FragmentContent
+	{
+		return this.items.map((item, index) =>
+		{
+			return [(index > 0 ? '\r\n' : ''), '[' + (item.state ? 'x' : ' ') + ']', ' ', item.content];
 		});
 	}
 }
