@@ -9,6 +9,16 @@ export function blockLevelFragment(constructor: Function)
 	constructor.prototype.blockLevel = true;
 }
 
+export function indentFragment(constructor: Function)
+{
+	constructor.prototype.indent = true;
+}
+
+export function lineFragment(constructor: Function)
+{
+	constructor.prototype.line = true;
+}
+
 export interface Fragment
 {
 	content: FragmentContent
@@ -22,6 +32,11 @@ export interface BlockLevelFragment extends Fragment
 export interface LinePrefixFragment extends Fragment
 {
 	linePrefix: TypeOrFunction<string>
+}
+
+export interface LineFragment extends Fragment
+{
+	line: true
 }
 
 export interface IndentFragment extends Fragment
@@ -158,7 +173,17 @@ export class Superscript extends WrappedFragment
 	}
 }
 
-export abstract class List implements IndentFragment
+export abstract class ListItem implements LineFragment
+{
+	line: true = true;
+	
+	content()
+	{
+		return null;
+	}
+}
+
+export abstract class List<T extends ListItem> implements IndentFragment
 {
 	indent: true = true;
 	private items: Array<FragmentContent> = [];
