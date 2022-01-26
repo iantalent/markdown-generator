@@ -2,7 +2,7 @@
 
 - [ ] Table
 - [ ] Lists
-- [ ] Emoji
+- [x] Emoji
 - [ ] Highlight
 - [ ] Subscript
 - [ ] Superscript

@@ -4,7 +4,7 @@ import {
 	BlockQuote,
 	Bold,
 	Code,
-	CodeBlock,
+	CodeBlock, Emoji,
 	Italic, Link,
 	Paragraph,
 	SimpleFragment,
@@ -102,6 +102,12 @@ class pageFragments
 			buildMarkdown([new Italic(new Link('/folder/index.php', 'link'))]),
 			'*[link](/folder/index.php)*'
 		);
+	}
+	
+	@test 'Emoji'()
+	{
+		assert.equal(buildMarkdown([new Emoji('joy')]), ':joy:');
+		assert.equal(buildMarkdown([new Emoji('tent')]), ':tent:');
 	}
 	
 	@test 'VuePress Builtin fragments'()

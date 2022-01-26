@@ -119,3 +119,11 @@ export class BlockQuote implements LinePrefixFragment
 	{
 	}
 }
+
+export class Emoji extends WrappedFragment
+{
+	constructor(emojiCode: string)
+	{
+		super(emojiCode, ':', ':');
+	}
+}
