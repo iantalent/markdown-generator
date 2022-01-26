@@ -5,7 +5,7 @@
 - [x] Emoji
 - [x] Highlight
 - [x] Subscript
-- [ ] Superscript
+- [x] Superscript
 - [ ] Definition Lists
 - [ ] Footnotes
 - [ ] Support SeparatedFragmentsContainer

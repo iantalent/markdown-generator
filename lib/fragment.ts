@@ -143,3 +143,11 @@ export class Subscript extends WrappedFragment
 		super(content, '~', '~');
 	}
 }
+
+export class Superscript extends WrappedFragment
+{
+	constructor(content: FragmentContent)
+	{
+		super(content, '^', '^');
+	}
+}
