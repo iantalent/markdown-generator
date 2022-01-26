@@ -1,7 +1,7 @@
 import {TypeOrFunction} from "./type";
 import {WrappedFragment, WrappedNewLineFragment} from "./fragment/common";
 
-export type FragmentContent = TypeOrFunction<string | Fragment | Array<FragmentContent>>;
+export type FragmentContent = (() => FragmentContent) | TypeOrFunction<string | Fragment | Array<FragmentContent>>;
 
 export function blockLevelFragment(constructor: Function)
 {
@@ -21,6 +21,11 @@ export interface BlockLevelFragment extends Fragment
 export interface LinePrefixFragment extends Fragment
 {
 	linePrefix: TypeOrFunction<string>
+}
+
+export interface IndentFragment extends Fragment
+{
+	indent: true
 }
 
 export class SimpleFragment implements Fragment, BlockLevelFragment
@@ -149,5 +154,33 @@ export class Superscript extends WrappedFragment
 	constructor(content: FragmentContent)
 	{
 		super(content, '^', '^');
+	}
+}
+
+export abstract class List implements IndentFragment
+{
+	indent: true = true;
+	private items: Array<FragmentContent> = [];
+	
+	constructor()
+	{
+	}
+	
+	add(...items: Array<FragmentContent>)
+	{
+		if(items.length)
+			this.items.push(...items);
+		
+		return this;
+	}
+	
+	protected abstract prefix(item: FragmentContent, index: number): string
+	
+	content(): FragmentContent
+	{
+		return this.items.map((item, index) =>
+		{
+			return [this.prefix(item, index), ' ', item];
+		});
 	}
 }
