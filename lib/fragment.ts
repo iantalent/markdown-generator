@@ -180,7 +180,7 @@ export abstract class List implements IndentFragment
 	{
 		return this.items.map((item, index) =>
 		{
-			return [this.prefix(item, index), ' ', item];
+			return [(index > 0 ? '\r\n' : ''), this.prefix(item, index), ' ', item];
 		});
 	}
 }
