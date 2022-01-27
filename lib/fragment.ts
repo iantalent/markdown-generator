@@ -1,6 +1,5 @@
 import {TypeOrFunction} from "./type";
 import {WrappedFragment, WrappedNewLineFragment} from "./fragment/common";
-import Ordered = Chai.Ordered;
 
 export type FragmentContent = (() => FragmentContent) | TypeOrFunction<string | Fragment | Array<FragmentContent>>;
 
@@ -173,85 +172,85 @@ export class Superscript extends WrappedFragment
 	}
 }
 
-export abstract class ListItem implements LineFragment
+export class ListItem implements Fragment
 {
-	line: true = true;
-	
-	content()
+	constructor(private readonly _content: FragmentContent)
 	{
-		return null;
+	}
+	
+	content(): FragmentContent
+	{
+		return this._content;
 	}
 }
 
 export abstract class List<T extends ListItem> implements IndentFragment
 {
 	indent: true = true;
-	private items: Array<FragmentContent> = [];
+	private entries: Array<LineFragment> = [];
 	
-	add(...items: Array<FragmentContent>)
+	add(...items: Array<T>): this
 	{
 		if(items.length)
-			this.items.push(...items);
-		
+		{
+			for(const item of items)
+			{
+				const prefix = this.prefix(item, this.entries.length);
+				this.entries.push({
+					line: true,
+					content: [prefix + (prefix ? ' ' : ''), item]
+				})
+			}
+		}
 		return this;
 	}
 	
-	protected abstract prefix(item: FragmentContent, index: number): string
+	protected abstract prefix(item: T, listLength: number): string
 	
 	content(): FragmentContent
 	{
-		return this.items.map((item, index) =>
-		{
-			return [(index > 0 ? '\r\n' : ''), this.prefix(item, index), ' ', item];
-		});
+		return this.entries;
 	}
 }
 
-export class OrderedList extends List
+export class OrderedList extends List<ListItem>
 {
-	protected prefix(item: FragmentContent, index: number): string
+	protected prefix(item: FragmentContent, listLength: number): string
 	{
-		return (index + 1) + '.';
+		return (listLength + 1) + '.';
 	}
 }
 
-export class UnorderedList extends List
+export class UnorderedList extends List<ListItem>
 {
-	protected prefix(item: FragmentContent, index: number): string
+	protected prefix(item: FragmentContent): string
 	{
 		return "-";
 	}
 }
 
-type TodoListItem = {
-	state: boolean,
-	content: FragmentContent
-};
-
-export class TodoList implements IndentFragment
+export class TodoListItem extends ListItem
 {
-	indent: true = true;
-	private items: Array<TodoListItem> = [];
-	
-	add(state: boolean, ...items: Array<FragmentContent>)
+	constructor(public readonly state: boolean, content: FragmentContent)
 	{
-		if(items.length)
-		{
-			for(const item of items)
-				this.items.push({
-					state: state,
-					content: item
-				});
-		}
-		
-		return this;
+		super(content);
+	}
+}
+
+export class TodoList extends List<TodoListItem>
+{
+	protected prefix(item: TodoListItem, listLength: number): string
+	{
+		return "[" + (item.state ? 'x' : ' ') + "]";
 	}
 	
-	content(): FragmentContent
+	add(...items: Array<TodoListItem>): this;
+	add(state: boolean, content: FragmentContent): this
+	add(contentOrState: any, content?: any)
 	{
-		return this.items.map((item, index) =>
-		{
-			return [(index > 0 ? '\r\n' : ''), '[' + (item.state ? 'x' : ' ') + ']', ' ', item.content];
-		});
+		if(typeof contentOrState === 'boolean')
+			return super.add(new TodoListItem(contentOrState, content));
+		
+		return super.add(contentOrState);
 	}
 }

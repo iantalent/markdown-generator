@@ -10,7 +10,7 @@ import {
 	SimpleFragment,
 	SimplePage,
 	StrikeThrough, Subscript, Superscript,
-	Tip,
+	Tip, TodoList, TodoListItem,
 } from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
@@ -119,6 +119,12 @@ class pageFragments
 	{
 		assert.equal(buildMarkdown(['H', new Subscript('2'), 'O']), 'H~2~O');
 		assert.equal(buildMarkdown(['X', new Superscript('2')]), 'X^2^');
+	}
+	
+	@test 'Lists'()
+	{
+		const todoList = new TodoList();
+		todoList.add(true, 'Completed').add(false, 'Not completed');
 	}
 	
 	@test 'VuePress Builtin fragments'()
