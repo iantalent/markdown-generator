@@ -3,41 +3,21 @@ import {WrappedFragment, WrappedNewLineFragment} from "./fragment/common";
 
 export type FragmentContent = (() => FragmentContent) | TypeOrFunction<string | Fragment | Array<FragmentContent>>;
 
-export function blockLevelFragment(constructor: Function)
-{
-	constructor.prototype.blockLevel = true;
-}
-
-export function indentFragment(constructor: Function)
-{
-	constructor.prototype.indent = true;
-}
-
-export function lineFragment(constructor: Function)
-{
-	constructor.prototype.line = true;
-}
-
 export interface Fragment
 {
 	content: FragmentContent
 }
 
-export enum FragmentLevel
+export enum ContentLevel
 {
 	DEFAULT,
 	LINE,
 	BLOCK
 }
 
-export interface FragmentLevelInterface extends Fragment
+export interface FragmentLevel extends Fragment
 {
-	level: FragmentLevel
-}
-
-export interface BlockLevelFragment extends Fragment
-{
-	blockLevel: TypeOrFunction<boolean>
+	level: ContentLevel
 }
 
 export interface LinePrefixFragment extends Fragment
@@ -45,40 +25,35 @@ export interface LinePrefixFragment extends Fragment
 	linePrefix: TypeOrFunction<string>
 }
 
-export interface LineFragment extends Fragment
-{
-	line: true
-}
-
 export interface IndentFragment extends Fragment
 {
 	indent: true
 }
 
-export class SimpleFragment implements Fragment, BlockLevelFragment
+export class SimpleFragment implements Fragment, FragmentLevel
 {
-	constructor(public readonly content: string, public readonly blockLevel: boolean = false)
+	constructor(public readonly content: string, public readonly level: ContentLevel = ContentLevel.DEFAULT)
 	{
 	}
 }
 
-@blockLevelFragment
-export class Paragraph implements Fragment
+export class Paragraph implements FragmentLevel
 {
+	level: ContentLevel = ContentLevel.BLOCK;
+	
 	constructor(public readonly content: FragmentContent)
 	{
 	}
 }
 
-@blockLevelFragment
-export class Heading extends WrappedFragment
+export class Heading extends WrappedFragment implements FragmentLevel
 {
+	level: ContentLevel = ContentLevel.BLOCK;
+	
 	constructor(content: FragmentContent, level: number = 1)
 	{
 		super(content, '#'.repeat(level) + ' ', '');
 	}
-	
-	blockLevel: boolean = true;
 }
 
 export class Bold extends WrappedFragment
@@ -142,9 +117,10 @@ export class Link implements Fragment
 	}
 }
 
-@blockLevelFragment
-export class BlockQuote implements LinePrefixFragment
+export class BlockQuote implements FragmentLevel, LinePrefixFragment
 {
+	level: ContentLevel = ContentLevel.BLOCK;
+	
 	linePrefix: string = '>';
 	
 	constructor(public readonly content: FragmentContent)
@@ -184,8 +160,10 @@ export class Superscript extends WrappedFragment
 	}
 }
 
-export class ListItem implements Fragment
+export class ListItem implements FragmentLevel
 {
+	level: ContentLevel = ContentLevel.LINE;
+	
 	constructor(private readonly _content: FragmentContent)
 	{
 	}
@@ -196,10 +174,26 @@ export class ListItem implements Fragment
 	}
 }
 
+
+class ListEntry<T extends ListItem> implements FragmentLevel
+{
+	content: FragmentContent;
+	level: ContentLevel = ContentLevel.LINE;
+	
+	constructor(item: T, prefix: string)
+	{
+		this.content = [
+			prefix,
+			prefix ? ' ' : '',
+			item
+		];
+	}
+}
+
 export abstract class List<T extends ListItem> implements IndentFragment
 {
 	indent: true = true;
-	private entries: Array<LineFragment> = [];
+	private entries: Array<ListEntry<T>> = [];
 	
 	add(...items: Array<T>): this
 	{
@@ -207,11 +201,10 @@ export abstract class List<T extends ListItem> implements IndentFragment
 		{
 			for(const item of items)
 			{
-				const prefix = this.prefix(item, this.entries.length);
-				this.entries.push({
-					line: true,
-					content: [prefix + (prefix ? ' ' : ''), item]
-				})
+				this.entries.push(new ListEntry<T>(
+					item,
+					this.prefix(item, this.entries.length)
+				))
 			}
 		}
 		return this;
