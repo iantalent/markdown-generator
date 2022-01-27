@@ -4,7 +4,7 @@ import {
 	BlockQuote,
 	Bold,
 	Code,
-	CodeBlock, Emoji, Highlight,
+	CodeBlock, ContentLevel, Emoji, Highlight,
 	Italic, Link,
 	Paragraph,
 	SimpleFragment,
@@ -22,7 +22,7 @@ class pageFragments
 	
 	before()
 	{
-	
+		console.log(typeof ContentLevel.LINE);
 	}
 	
 	@test 'Simple Page'()

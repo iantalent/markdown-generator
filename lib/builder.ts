@@ -7,7 +7,7 @@ import {
 import {Page} from "./page";
 import {isFragment, isFragmentsContainer} from "./utils";
 import {getTypeOrFunctionValue} from "./type";
-import {BlockLevelFragment, Fragment, FragmentContent, LinePrefixFragment} from "./fragment";
+import {BlockLevelFragment, Fragment, FragmentContent, FragmentLevel, LinePrefixFragment} from "./fragment";
 
 type Container = FragmentsContainer | Page | Array<FragmentsContainerEntry>;
 
@@ -21,6 +21,11 @@ function createContainerFromArray(array: Array<FragmentsContainerEntry>): Fragme
 	return {
 		tree: () => array
 	}
+}
+
+function isFragmentLevel(fragment: any): fragment is FragmentLevel
+{
+	return ['boolean', 'function'].indexOf(typeof fragment['blockLevel']) !== -1 && isFragment(fragment);
 }
 
 function isBlockLevelFragment(fragment: any): fragment is BlockLevelFragment

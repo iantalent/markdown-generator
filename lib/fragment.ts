@@ -17,7 +17,7 @@ export enum ContentLevel
 
 export interface FragmentLevel extends Fragment
 {
-	level: ContentLevel
+	level: TypeOrFunction<ContentLevel>
 }
 
 export interface LinePrefixFragment extends Fragment
