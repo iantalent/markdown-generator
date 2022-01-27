@@ -246,11 +246,10 @@ export class TodoList extends List<TodoListItem>
 	
 	add(...items: Array<TodoListItem>): this;
 	add(state: boolean, content: FragmentContent): this
-	add(contentOrState: any, content?: any)
+	add(contentOrState: any, content?: any): this
 	{
-		if(typeof contentOrState === 'boolean')
-			return super.add(new TodoListItem(contentOrState, content));
-		
-		return super.add(contentOrState);
+		return typeof contentOrState === 'boolean' ?
+			super.add(new TodoListItem(contentOrState, content)) :
+			super.add(contentOrState);
 	}
 }

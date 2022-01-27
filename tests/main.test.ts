@@ -125,6 +125,7 @@ class pageFragments
 	{
 		const todoList = new TodoList();
 		todoList.add(true, 'Completed').add(false, 'Not completed');
+		assert.equal(buildMarkdown([todoList]), '[x] Completed\r\n[ ] Not completed');
 	}
 	
 	@test 'VuePress Builtin fragments'()

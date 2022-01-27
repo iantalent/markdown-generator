@@ -33,9 +33,16 @@ function isLinePrefixFragment(fragment: any): fragment is LinePrefixFragment
 	return ['string', 'function'].indexOf(typeof fragment['linePrefix']) !== -1 && isFragment(fragment);
 }
 
+enum LineLevel
+{
+	DEFAULT,
+	LINE,
+	BLOCK
+}
+
 class FragmentResult
 {
-	public blockLevel: boolean = false;
+	public lineLevel: LineLevel = LineLevel.BLOCK;
 	public prefixes: Array<string> = [];
 	public indent: number = 0;
 	public content: string = '';
@@ -52,7 +59,7 @@ class FragmentResult
 	}
 }
 
-enum RequireBlankLineState
+enum NewlinePolicy
 {
 	NONE,
 	NEXT_BLOCK_LEVEL,
@@ -61,7 +68,8 @@ enum RequireBlankLineState
 
 type builderState = {
 	isFirstLine: boolean,
-	requireBlankLine: RequireBlankLineState,
+	requireBlankLine: NewlinePolicy,
+	requireLineEnd: NewlinePolicy,
 	linePrefixes: Array<string>;
 };
 
@@ -92,7 +100,8 @@ export class MarkdownBuilder
 	
 	private buildFragmentsResults(results: Array<FragmentResult>, state: builderState = {
 		isFirstLine: true,
-		requireBlankLine: RequireBlankLineState.NONE,
+		requireBlankLine: NewlinePolicy.NONE,
+		requireLineEnd: NewlinePolicy.NONE,
 		linePrefixes: [] // Todo line prefixes interface for lazy and once calculation of full prefixes
 	}): string
 	{
@@ -113,18 +122,18 @@ export class MarkdownBuilder
 				}).join('\r\n');
 			}
 			
-			if(entry.blockLevel)
+			if(entry.lineLevel)
 			{
-				if(!state.isFirstLine || state.requireBlankLine !== RequireBlankLineState.NONE)
+				if(!state.isFirstLine || state.requireBlankLine !== NewlinePolicy.NONE)
 					prependLineBreak = true;
 				
-				state.requireBlankLine = RequireBlankLineState.NEXT_BLOCK_LEVEL;
+				state.requireBlankLine = NewlinePolicy.NEXT_BLOCK_LEVEL;
 				state.linePrefixes = [...entry.prefixes];
 			}
-			else if(state.requireBlankLine === RequireBlankLineState.NEXT_ANY)
+			else if(state.requireBlankLine === NewlinePolicy.NEXT_ANY)
 			{
 				prependLineBreak = true;
-				state.requireBlankLine = RequireBlankLineState.NONE;
+				state.requireBlankLine = NewlinePolicy.NONE;
 				state.linePrefixes = prevPrefixes;
 			}
 			
@@ -139,9 +148,9 @@ export class MarkdownBuilder
 			if(entry.results.length)
 				result += this.buildFragmentsResults(entry.results, state);
 			
-			if(entry.blockLevel)
+			if(entry.lineLevel)
 			{
-				state.requireBlankLine = RequireBlankLineState.NEXT_ANY;
+				state.requireBlankLine = NewlinePolicy.NEXT_ANY;
 				state.linePrefixes = prevPrefixes;
 			}
 			
@@ -175,7 +184,7 @@ export class MarkdownBuilder
 					clearPrefix = true;
 				}
 				result = new FragmentResult(this.buildFragment(entry));
-				result.blockLevel = isBlockLevel;
+				result.lineLevel = isBlockLevel;
 			}
 			else
 				throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);
