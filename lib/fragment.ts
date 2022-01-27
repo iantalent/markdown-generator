@@ -23,6 +23,18 @@ export interface Fragment
 	content: FragmentContent
 }
 
+export enum FragmentLevel
+{
+	DEFAULT,
+	LINE,
+	BLOCK
+}
+
+export interface FragmentLevelInterface extends Fragment
+{
+	level: FragmentLevel
+}
+
 export interface BlockLevelFragment extends Fragment
 {
 	blockLevel: TypeOrFunction<boolean>
