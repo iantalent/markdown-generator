@@ -22,7 +22,7 @@ class pageFragments
 	
 	before()
 	{
-		console.log(typeof ContentLevel.LINE);
+	
 	}
 	
 	@test 'Simple Page'()

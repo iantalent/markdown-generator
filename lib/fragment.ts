@@ -10,9 +10,9 @@ export interface Fragment
 
 export enum ContentLevel
 {
-	DEFAULT,
-	LINE,
-	BLOCK
+	DEFAULT = 1,
+	LINE = 2,
+	BLOCK = 3
 }
 
 export interface FragmentLevel extends Fragment
