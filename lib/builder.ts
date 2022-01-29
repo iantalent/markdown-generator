@@ -1,20 +1,8 @@
-import {
-	FragmentsContainer,
-	FragmentsContainerEntry,
-	SeparatedFragmentsContainer,
-	SimpleFragmentsContainer
-} from "./container";
+import {FragmentsContainer, FragmentsContainerEntry, SeparatedFragmentsContainer} from "./container";
 import {Page} from "./page";
 import {isFragment, isFragmentsContainer} from "./utils";
 import {getTypeOrFunctionValue} from "./type";
-import {
-	BlockLevelFragment,
-	ContentLevel,
-	Fragment,
-	FragmentContent,
-	FragmentLevel,
-	LinePrefixFragment
-} from "./fragment";
+import {ContentLevel, Fragment, FragmentContent, FragmentLevel, LinePrefixFragment} from "./fragment";
 
 type Container = FragmentsContainer | Page | Array<FragmentsContainerEntry>;
 
@@ -33,11 +21,6 @@ function createContainerFromArray(array: Array<FragmentsContainerEntry>): Fragme
 function isContentLevel(fragment: any): fragment is FragmentLevel
 {
 	return ['number', 'function'].indexOf(typeof fragment['level']) !== -1 && isFragment(fragment);
-}
-
-function isBlockLevelFragment(fragment: any): fragment is BlockLevelFragment
-{
-	return ['boolean', 'function'].indexOf(typeof fragment['blockLevel']) !== -1 && isFragment(fragment);
 }
 
 function isLinePrefixFragment(fragment: any): fragment is LinePrefixFragment
@@ -66,15 +49,15 @@ class FragmentResult
 
 enum NewlinePolicy
 {
-	NONE,
-	NEXT_LEVEL,
-	NEXT_ANY
+	NONE = 1,
+	NEXT_LEVEL = 2,
+	NEXT_ANY = 3
 }
 
 type builderState = {
 	isFirstLine: boolean,
 	requireBlankLine: NewlinePolicy,
-	requiredBlankLinesCount: number,
+	requireContentLevel: ContentLevel,
 	requireLineEnd: NewlinePolicy,
 	linePrefixes: Array<string>;
 };
@@ -111,7 +94,7 @@ export class MarkdownBuilder
 	private buildFragmentsResults(results: Array<FragmentResult>, state: builderState = {
 		isFirstLine: true,
 		requireBlankLine: NewlinePolicy.NONE,
-		requiredBlankLinesCount: 0,
+		requireContentLevel: ContentLevel.DEFAULT,
 		requireLineEnd: NewlinePolicy.NONE,
 		linePrefixes: [] // Todo line prefixes interface for lazy and once calculation of full prefixes
 	}): string
@@ -125,6 +108,9 @@ export class MarkdownBuilder
 			
 			if(state.linePrefixes.length && result && result.match(/\r?\n/g))
 			{
+				if(state.isFirstLine)
+					state.isFirstLine = false;
+				
 				const newLinesPrefixes = state.linePrefixes.join('');
 				result = result.split(/\r?\n/g).map((line, index) =>
 				{
@@ -132,29 +118,35 @@ export class MarkdownBuilder
 				}).join('\r\n');
 			}
 			
+			// if current entry is block or line level
 			if(entry.lineLevel !== ContentLevel.DEFAULT)
 			{
+				//if not first line or previous entry is block or line level
 				if(!state.isFirstLine || state.requireBlankLine !== NewlinePolicy.NONE)
-					prependLineBreak = entry.lineLevel === ContentLevel.BLOCK ? 2 : 1;
+					prependLineBreak = entry.lineLevel === ContentLevel.BLOCK ||
+					state.requireContentLevel === ContentLevel.BLOCK ? 2 : 1;
 				
+				state.requireContentLevel = entry.lineLevel;
 				state.requireBlankLine = NewlinePolicy.NEXT_LEVEL;
 				state.linePrefixes = [...entry.prefixes];
 			}
 			else if(state.requireBlankLine === NewlinePolicy.NEXT_ANY)
 			{
-				prependLineBreak = state.requiredBlankLinesCount;
+				prependLineBreak = state.requireContentLevel === ContentLevel.BLOCK ? 2 : 1;
+				state.requireContentLevel = ContentLevel.DEFAULT;
 				state.requireBlankLine = NewlinePolicy.NONE;
 				state.linePrefixes = prevPrefixes;
 			}
 			
+			if(prependLineBreak && state.isFirstLine)
+				state.isFirstLine = false;
+			
 			if(prependLineBreak)
-				resultPrefixes += fillArray('\r\n', entry.lineLevel === ContentLevel.BLOCK ? 2 : 1)
+				resultPrefixes += fillArray('\r\n', prependLineBreak)
 					.join(prevPrefixes.join(''));
 			
 			if(entry.prefixes.length && entry.content)
 				resultPrefixes += entry.prefixes.join('') + ' ';
-			
-			state.isFirstLine = false;
 			
 			if(entry.results.length)
 				result += this.buildFragmentsResults(entry.results, state);
@@ -162,6 +154,7 @@ export class MarkdownBuilder
 			if(entry.lineLevel !== ContentLevel.DEFAULT)
 			{
 				state.requireBlankLine = NewlinePolicy.NEXT_ANY;
+				state.requireContentLevel = entry.lineLevel;
 				state.linePrefixes = prevPrefixes;
 			}
 			
@@ -193,7 +186,12 @@ export class MarkdownBuilder
 					clearPrefix = true;
 				}
 				result = new FragmentResult(this.buildFragment(entry));
-				result.lineLevel = isContentLevel(entry) ? getTypeOrFunctionValue(entry.level, entry) : ContentLevel.DEFAULT;
+				
+				if(isContentLevel(entry))
+					result.lineLevel = getTypeOrFunctionValue(entry.level, entry);
+				
+				if(!result.lineLevel)
+					result.lineLevel = ContentLevel.DEFAULT;
 			}
 			else
 				throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);

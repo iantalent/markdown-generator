@@ -32,7 +32,7 @@ export interface IndentFragment extends Fragment
 
 export class SimpleFragment implements Fragment, FragmentLevel
 {
-	constructor(public readonly content: string, public readonly level: ContentLevel = ContentLevel.DEFAULT)
+	constructor(public readonly content: string, public readonly level: ContentLevel = ContentLevel.BLOCK)
 	{
 	}
 }
@@ -160,10 +160,8 @@ export class Superscript extends WrappedFragment
 	}
 }
 
-export class ListItem implements FragmentLevel
+export class ListItem implements Fragment
 {
-	level: ContentLevel = ContentLevel.LINE;
-	
 	constructor(private readonly _content: FragmentContent)
 	{
 	}
