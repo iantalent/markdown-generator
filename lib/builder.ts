@@ -34,7 +34,7 @@ function isLinePrefixFragment(fragment: any): fragment is LinePrefixFragment
 	return ['string', 'function'].indexOf(typeof fragment['linePrefix']) !== -1 && isFragment(fragment);
 }
 
-class MarkdownLine
+export class MarkdownLine
 {
 	prefixes: Array<string> = [];
 	indent: number = 0;
@@ -52,7 +52,7 @@ class MarkdownLine
 		{
 			const newLine = new MarkdownLine(line);
 			
-			if(index > 0 && index + 1 <= array.length)
+			if(index > 0 && index + 1 < array.length)
 				newLine.realLine = true;
 			
 			return newLine;
@@ -192,7 +192,7 @@ export class MarkdownBuilder
 				}
 			}
 		});
-		console.log(lines);
+		//console.log(lines);
 		return Array.from(merged)
 	}
 	

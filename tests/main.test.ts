@@ -13,6 +13,8 @@ import {
 	Tip, TodoList, TodoListItem, UnorderedList,
 } from "../lib";
 import {buildMarkdown} from "../lib/utils";
+import MarkdownIt = require("markdown-it");
+import {MarkdownLine} from "../lib/builder";
 
 const assert = chai.assert;
 
@@ -23,6 +25,18 @@ class pageFragments
 	before()
 	{
 	
+	}
+	
+	@test 'line'()
+	{
+		const lines = MarkdownLine.fromContent('start\r\n\r\nend');
+		assert.equal(lines.length, 3);
+		assert.isFalse(lines[0].realLine);
+		assert.equal(lines[0].content(), 'start');
+		assert.isTrue(lines[1].realLine);
+		assert.isEmpty(lines[1].content());
+		assert.isFalse(lines[2].realLine);
+		assert.equal(lines[2].content(), 'end');
 	}
 	
 	@test 'Simple Page'()
