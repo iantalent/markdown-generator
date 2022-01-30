@@ -48,11 +48,11 @@ class MarkdownLine
 	
 	static fromContent(content: string): Array<MarkdownLine>
 	{
-		return content.split(/\r?\n/g).map((line, index) =>
+		return content.split(/\r?\n/g).map((line, index, array) =>
 		{
 			const newLine = new MarkdownLine(line);
 			
-			if(index > 0)
+			if(index > 0 && index + 1 <= array.length)
 				newLine.realLine = true;
 			
 			return newLine;
@@ -70,6 +70,11 @@ class MarkdownLine
 			throw new Error('This lines can\'t be merged. You should check it before merge (via canBeMerged)');
 		
 		this.lineContent += line.lineContent;
+	}
+	
+	isEmpty()
+	{
+		return this.lineContent.length <= 0;
 	}
 	
 	content(): string
@@ -167,21 +172,27 @@ export class MarkdownBuilder
 		{
 			merged.add(line);
 			
-			if(prevToMerge && prevToMerge.canBeMerged(line))
-			{
-				prevToMerge.merge(line);
-				merged.delete(line);
-			}
+			if(!prevToMerge)
+				prevToMerge = line;
 			else
 			{
-				if(prevToMerge && prevToMerge.needLineBreakBefore > 1)
+				if(prevToMerge.canBeMerged(line))
 				{
-					prependedNewLine = true;
-					this.prependEmptyLines(merged, prevToMerge.needLineBreakBefore - 1);
+					prevToMerge.merge(line);
+					merged.delete(line);
 				}
-				prevToMerge = line;
+				else
+				{
+					if(prevToMerge.needLineBreakAfter > 1)
+					{
+						prependedNewLine = true;
+						this.prependEmptyLines(merged, prevToMerge.needLineBreakAfter - 1);
+					}
+					prevToMerge = line;
+				}
 			}
 		});
+		console.log(lines);
 		return Array.from(merged)
 	}
 	

@@ -146,5 +146,6 @@ class pageFragments
 	@test 'VuePress Builtin fragments'()
 	{
 		assert.equal(buildMarkdown([new Tip('Tip content')]), '::: tip\r\n\r\nTip content\r\n\r\n:::');
+		assert.equal(buildMarkdown(['-start', '\r\n\r\n', 'info', '\r\n\r\n', '-end']), '-start\r\n\r\ninfo\r\n\r\n-end');
 	}
 }
