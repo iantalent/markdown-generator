@@ -5,12 +5,12 @@ import {
 	Bold,
 	Code,
 	CodeBlock, ContentLevel, Emoji, Highlight,
-	Italic, Link,
+	Italic, Link, ListItem,
 	Paragraph,
 	SimpleFragment,
 	SimplePage,
 	StrikeThrough, Subscript, Superscript,
-	Tip, TodoList, TodoListItem,
+	Tip, TodoList, TodoListItem, UnorderedList,
 } from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
@@ -126,6 +126,21 @@ class pageFragments
 		const todoList = new TodoList();
 		todoList.add(true, 'Completed').add(false, 'Not completed');
 		assert.equal(buildMarkdown([todoList]), '[x] Completed\r\n[ ] Not completed');
+		
+		assert.equal(
+			buildMarkdown([
+				(new UnorderedList())
+					.add('first')
+					.add('second')
+					.add(
+						(new UnorderedList())
+							.add('third')
+							.add('fourth')
+					)
+					
+			]),
+			'- first\r\n- second\r\n\t- third\r\n\t- fourth'
+		);
 	}
 	
 	@test 'VuePress Builtin fragments'()

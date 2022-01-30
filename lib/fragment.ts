@@ -191,18 +191,22 @@ class ListEntry<T extends ListItem> implements FragmentLevel
 export abstract class List<T extends ListItem> implements IndentFragment
 {
 	indent: true = true;
-	private entries: Array<ListEntry<T>> = [];
+	private entries: Array<ListEntry<T> | List<any>> = [];
 	
-	add(...items: Array<T>): this
+	add(...items: Array<T | List<any>>): this
 	{
 		if(items.length)
 		{
 			for(const item of items)
 			{
-				this.entries.push(new ListEntry<T>(
-					item,
-					this.prefix(item, this.entries.length)
-				))
+				this.entries.push(
+					item instanceof List ?
+						item :
+						new ListEntry<T>(
+							item,
+							this.prefix(item, this.entries.length)
+						)
+				)
 			}
 		}
 		return this;
@@ -216,7 +220,39 @@ export abstract class List<T extends ListItem> implements IndentFragment
 	}
 }
 
-export class OrderedList extends List<ListItem>
+export abstract class CommonList extends List<ListItem>
+{
+	add(...items: Array<ListItem | List<any>>): this;
+	add(content: FragmentContent): this
+	add(itemsOrContent: any): this
+	{
+		if(!Array.isArray(itemsOrContent))
+			itemsOrContent = [itemsOrContent];
+		
+		let lineFragments: Array<FragmentContent> = [];
+		for(const item of itemsOrContent)
+		{
+			if(item instanceof ListItem || item instanceof List)
+			{
+				if(lineFragments.length)
+				{
+					super.add((new ListItem(lineFragments)));
+					lineFragments = [];
+				}
+				super.add(item);
+			}
+			else
+				lineFragments.push(item);
+		}
+		
+		if(lineFragments.length)
+			super.add(new ListItem(lineFragments));
+		
+		return this;
+	}
+}
+
+export class OrderedList extends CommonList
 {
 	protected prefix(item: FragmentContent, listLength: number): string
 	{
@@ -224,7 +260,7 @@ export class OrderedList extends List<ListItem>
 	}
 }
 
-export class UnorderedList extends List<ListItem>
+export class UnorderedList extends CommonList
 {
 	protected prefix(item: FragmentContent): string
 	{
