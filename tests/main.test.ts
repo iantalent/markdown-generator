@@ -93,6 +93,20 @@ class pageFragments
 		
 		assert.equal(
 			buildMarkdown(
+				[new BlockQuote('first'), new BlockQuote('second')]
+			),
+			'> first\r\n>\r\n> second'
+		);
+		
+		assert.equal(
+			buildMarkdown(
+				[new BlockQuote(['first', new BlockQuote('second')])]
+			),
+			'> first\r\n>\r\n>> second'
+		);
+		
+		assert.equal(
+			buildMarkdown(
 				[new BlockQuote([
 					'start',
 					new Paragraph('second'),
@@ -103,6 +117,8 @@ class pageFragments
 			),
 			'> start\r\n>\r\n> second\r\n>\r\n> third\r\n>\r\n>> fourth\r\n>\r\n> six'
 		);
+		
+		
 	}
 	
 	@test 'CodeBlock'()
