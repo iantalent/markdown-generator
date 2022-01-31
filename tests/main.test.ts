@@ -90,6 +90,19 @@ class pageFragments
 			buildMarkdown([new BlockQuote('content\r\nsub content')]),
 			'> content\r\n> sub content'
 		);
+		
+		assert.equal(
+			buildMarkdown(
+				[new BlockQuote([
+					'start',
+					new Paragraph('second'),
+					new Paragraph('third'),
+					new BlockQuote('fourth'),
+					'six'
+				])]
+			),
+			'> start\r\n>\r\n> second\r\n>\r\n> third\r\n>\r\n>> fourth\r\n>\r\n> six'
+		);
 	}
 	
 	@test 'CodeBlock'()
@@ -160,10 +173,12 @@ class pageFragments
 						(new UnorderedList())
 							.add('third')
 							.add('fourth')
+							.add(['six', new BlockQuote('quote')])
 					)
+					.add('seven')
 					
 			]),
-			'- first\r\n- second\r\n\t- third\r\n\t- fourth'
+			'- first\r\n- second\r\n\t- third\r\n\t- fourth\r\n\t- six\r\n\r\n\t\t> quote\r\n\r\n- seven'
 		);
 	}
 	

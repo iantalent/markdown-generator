@@ -184,8 +184,6 @@ export class MarkdownBuilder
 		
 		let prevToMerge: MarkdownLine | null = null;
 		
-		//console.log(lines);
-		
 		lines.forEach((line) =>
 		{
 			merged.push(line);
@@ -208,7 +206,7 @@ export class MarkdownBuilder
 							merged,
 							Math.max(prevToMerge.needLineBreakAfter, line.needLineBreakBefore) - 1,
 							merged.length - 1,
-							prevToMerge.prefixes
+							line.needLineBreakBefore > 1 && line.prefixes.length < prevToMerge.prefixes.length ? line.prefixes : prevToMerge.prefixes
 						);
 						prevToMerge = merged[merged.length - 1];
 					}
@@ -217,7 +215,6 @@ export class MarkdownBuilder
 				}
 			}
 		});
-		//console.log(merged);
 		return merged;
 	}
 	
@@ -228,15 +225,14 @@ export class MarkdownBuilder
 			let prefixes = '',
 				lineContent = line.content();
 			
-			if(lineContent.length)
+			if(lineContent.length || line.prefixes.length)
 			{
 				if(line.indent > 1)
 					prefixes += ('\t').repeat(line.indent - 1);
 				
 				if(line.prefixes.length)
-					prefixes += line.prefixes.join('') + ' ';
+					prefixes += line.prefixes.join('') + (lineContent.length ? ' ' : '');
 			}
-			
 			return prefixes + lineContent;
 		}).join('\r\n');
 	}
