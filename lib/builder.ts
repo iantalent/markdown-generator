@@ -40,7 +40,8 @@ export class MarkdownLine
 	indent: number = 0;
 	needLineBreakBefore: number = 0;
 	needLineBreakAfter: number = 0;
-	realLine: boolean = false;
+	splittedByLeft: boolean = false;
+	splittedByRight: boolean = false;
 	
 	constructor(private lineContent: string)
 	{
@@ -52,16 +53,18 @@ export class MarkdownLine
 		{
 			const newLine = new MarkdownLine(line);
 			
-			if(index > 0 && index + 1 < array.length)
-				newLine.realLine = true;
-			
+			if(array.length > 1)
+			{
+				newLine.splittedByRight = index + 1 < array.length;
+				newLine.splittedByLeft = index > 0;
+			}
 			return newLine;
 		});
 	}
 	
 	canBeMerged(line: MarkdownLine): boolean
 	{
-		return this.needLineBreakAfter <= 0 && line.needLineBreakBefore <= 0 && !this.realLine && !line.realLine;
+		return this.needLineBreakAfter <= 0 && line.needLineBreakBefore <= 0 && !this.splittedByRight && !line.splittedByLeft;
 	}
 	
 	merge(line: MarkdownLine)

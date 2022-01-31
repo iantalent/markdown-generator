@@ -31,11 +31,14 @@ class pageFragments
 	{
 		const lines = MarkdownLine.fromContent('start\r\n\r\nend');
 		assert.equal(lines.length, 3);
-		assert.isFalse(lines[0].realLine);
+		assert.isFalse(lines[0].splittedByLeft);
+		assert.isTrue(lines[0].splittedByRight);
 		assert.equal(lines[0].content(), 'start');
-		assert.isTrue(lines[1].realLine);
+		assert.isTrue(lines[1].splittedByLeft);
+		assert.isTrue(lines[1].splittedByRight);
 		assert.isEmpty(lines[1].content());
-		assert.isFalse(lines[2].realLine);
+		assert.isTrue(lines[2].splittedByLeft);
+		assert.isFalse(lines[2].splittedByRight);
 		assert.equal(lines[2].content(), 'end');
 	}
 	
