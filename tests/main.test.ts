@@ -80,74 +80,6 @@ class pageFragments
 			'Some paragraph info');
 	}
 	
-	@test 'BlockQuote'()
-	{
-		assert.equal(buildMarkdown([new BlockQuote('Quote')]), '> Quote');
-		assert.equal(buildMarkdown([new BlockQuote(['Quote', new BlockQuote('Sub quote')])]),
-			'> Quote\r\n>\r\n>> Sub quote'
-		);
-		assert.equal(
-			buildMarkdown([new BlockQuote('content\r\nsub content')]),
-			'> content\r\n> sub content'
-		);
-		
-		assert.equal(
-			buildMarkdown(
-				[new BlockQuote('first'), new BlockQuote('second')]
-			),
-			'> first\r\n>\r\n> second'
-		);
-		
-		assert.equal(
-			buildMarkdown(
-				[new BlockQuote(['first', new BlockQuote('second')])]
-			),
-			'> first\r\n>\r\n>> second'
-		);
-		
-		assert.equal(
-			buildMarkdown(
-				[new BlockQuote(['first', new BlockQuote('second'), new Paragraph('paragraph')])]
-			),
-			'> first\r\n>\r\n>> second\r\n\r\nparagraph'
-		);
-		
-		assert.equal(
-			buildMarkdown(
-				[new BlockQuote([
-					'start',
-					new Paragraph('second'),
-					new Paragraph('third'),
-					new BlockQuote('fourth'),
-					'six'
-				])]
-			),
-			'> start\r\n>\r\n> second\r\n>\r\n> third\r\n>\r\n>> fourth\r\n>\r\n> six'
-		);
-		
-		
-	}
-	
-	@test 'CodeBlock'()
-	{
-		assert.equal(
-			buildMarkdown([new CodeBlock('var test = "lang";\r\nconsole.log(test);', 'js')]),
-			'```js\r\n\r\nvar test = "lang";\r\nconsole.log(test);\r\n\r\n```'
-		);
-	}
-	
-	@test 'Strikethrough'()
-	{
-		assert.equal(buildMarkdown([new StrikeThrough('message')]), '~~message~~');
-		assert.equal(
-			buildMarkdown([
-				new Paragraph(new StrikeThrough('message 1')),
-				new Paragraph(new StrikeThrough('message 2')),
-			]),
-			'~~message 1~~\r\n\r\n~~message 2~~'
-		);
-	}
-	
 	@test 'links'()
 	{
 		assert.equal(
@@ -168,41 +100,6 @@ class pageFragments
 	{
 		assert.equal(buildMarkdown([new Emoji('joy')]), ':joy:');
 		assert.equal(buildMarkdown([new Emoji('tent')]), ':tent:');
-	}
-	
-	@test 'Highlight'()
-	{
-		assert.equal(buildMarkdown([new Highlight('highlighted content')]), '==highlighted content==');
-	}
-	
-	@test 'Subscript and Superscript'()
-	{
-		assert.equal(buildMarkdown(['H', new Subscript('2'), 'O']), 'H~2~O');
-		assert.equal(buildMarkdown(['X', new Superscript('2')]), 'X^2^');
-	}
-	
-	@test 'Lists'()
-	{
-		const todoList = new TodoList();
-		todoList.add(true, 'Completed').add(false, 'Not completed');
-		assert.equal(buildMarkdown([todoList]), '[x] Completed\r\n[ ] Not completed');
-		
-		assert.equal(
-			buildMarkdown([
-				(new UnorderedList())
-					.add('first')
-					.add('second')
-					.add(
-						(new UnorderedList())
-							.add('third')
-							.add('fourth')
-							.add(['six', new BlockQuote('quote')])
-					)
-					.add('seven')
-					
-			]),
-			'- first\r\n- second\r\n\t- third\r\n\t- fourth\r\n\t- six\r\n\r\n\t\t> quote\r\n\r\n- seven'
-		);
 	}
 	
 	@test 'VuePress Builtin fragments'()
