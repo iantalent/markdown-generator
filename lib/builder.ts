@@ -64,7 +64,7 @@ export class MarkdownLine
 	
 	canBeMerged(line: MarkdownLine): boolean
 	{
-		return this.needLineBreakAfter <= 0 && line.needLineBreakBefore <= 0 && !this.splittedByRight && !line.splittedByLeft;
+		return this.needLineBreakAfter <= 0 && line.needLineBreakBefore <= 0 && (!this.splittedByRight && !line.splittedByLeft);
 	}
 	
 	merge(line: MarkdownLine)
@@ -73,6 +73,8 @@ export class MarkdownLine
 			throw new Error('This lines can\'t be merged. You should check it before merge (via canBeMerged)');
 		
 		this.lineContent += line.lineContent;
+		if(line.needLineBreakAfter > 0)
+			this.needLineBreakAfter = line.needLineBreakAfter;
 	}
 	
 	isEmpty()
@@ -158,22 +160,24 @@ export class MarkdownBuilder
 		);*/
 	}
 	
-	private prependEmptyLines(lines: Set<MarkdownLine>, count: number)
+	private prependEmptyLines(lines: Array<MarkdownLine>, count: number)
 	{
 		for(let i = 0; i < count; i++)
-			lines.add(new MarkdownLine(''));
+			lines.push(new MarkdownLine(''));
 	}
 	
 	private mergeLines(lines: Array<MarkdownLine>): Array<MarkdownLine>
 	{
-		const merged = new Set<MarkdownLine>();
+		const merged: Array<MarkdownLine> = [];
 		let prependedNewLine = false;
 		
 		let prevToMerge: MarkdownLine | null = null;
 		
+		//console.log(lines);
+		
 		lines.forEach((line) =>
 		{
-			merged.add(line);
+			merged.push(line);
 			
 			if(!prevToMerge)
 				prevToMerge = line;
@@ -182,21 +186,24 @@ export class MarkdownBuilder
 				if(prevToMerge.canBeMerged(line))
 				{
 					prevToMerge.merge(line);
-					merged.delete(line);
+					merged.splice(merged.length - 1, 1);
 				}
 				else
 				{
-					if(prevToMerge.needLineBreakAfter > 1)
+					if(prevToMerge.needLineBreakAfter > 1 || line.needLineBreakBefore > 1)
 					{
 						prependedNewLine = true;
-						this.prependEmptyLines(merged, prevToMerge.needLineBreakAfter - 1);
+						this.prependEmptyLines(
+							merged,
+							Math.max(prevToMerge.needLineBreakAfter, line.needLineBreakBefore) - 1
+						);
 					}
 					prevToMerge = line;
 				}
 			}
 		});
-		//console.log(lines);
-		return Array.from(merged)
+		//console.log(merged);
+		return merged;
 	}
 	
 	private buildLines(lines: Array<MarkdownLine>): string
