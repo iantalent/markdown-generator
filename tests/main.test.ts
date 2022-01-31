@@ -74,22 +74,6 @@ class pageFragments
 			'Some paragraph info');
 	}
 	
-	@test 'links'()
-	{
-		assert.equal(
-			buildMarkdown([new Link('/folder/index.php', 'link')]),
-			'[link](/folder/index.php)'
-		);
-		assert.equal(
-			buildMarkdown([new Link('/folder/index.php', ['text ', new Bold('link')])]),
-			'[text **link**](/folder/index.php)'
-		);
-		assert.equal(
-			buildMarkdown([new Italic(new Link('/folder/index.php', 'link'))]),
-			'*[link](/folder/index.php)*'
-		);
-	}
-	
 	@test 'Emoji'()
 	{
 		assert.equal(buildMarkdown([new Emoji('joy')]), ':joy:');
