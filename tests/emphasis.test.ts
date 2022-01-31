@@ -1,16 +1,6 @@
 import {suite, test} from '@testdeck/mocha';
 import * as chai from 'chai';
-import {
-	Bold,
-	BoldItalic,
-	CodeBlock,
-	Highlight,
-	Italic,
-	Paragraph,
-	StrikeThrough,
-	Subscript,
-	Superscript,
-} from "../lib";
+import {Bold, BoldItalic, Highlight, Italic, StrikeThrough, Subscript, Superscript,} from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
@@ -36,25 +26,6 @@ class EmphasisTest
 	@test 'strikethrough'()
 	{
 		assert.equal(buildMarkdown([new StrikeThrough('message')]), '~~message~~');
-	}
-	
-	@test 'paragraph with strikethrough'()
-	{
-		assert.equal(
-			buildMarkdown([new Paragraph(new StrikeThrough('message 1'))]),
-			'~~message 1~~'
-		);
-	}
-	
-	@test 'paragraphs with strikethrough'()
-	{
-		assert.equal(
-			buildMarkdown([
-				new Paragraph(new StrikeThrough('message 1')),
-				new Paragraph(new StrikeThrough('message 2')),
-			]),
-			'~~message 1~~\r\n\r\n~~message 2~~'
-		);
 	}
 	
 	@test 'highlight'()
