@@ -5,12 +5,12 @@ import {
 	Bold,
 	Code,
 	CodeBlock,
-	Emoji,
+	Emoji, Heading,
 	Highlight,
 	Italic,
 	Link,
 	Paragraph,
-	SimpleFragment,
+	SimpleFragment, SimpleFragmentsContainer,
 	SimplePage,
 	StrikeThrough,
 	Subscript,
@@ -48,10 +48,11 @@ class pageFragments
 		assert.equal(lines[2].content(), 'end');
 	}
 	
-	@test 'Simple Page'()
+	@test 'Simple Container'()
 	{
-		const page = new SimplePage("title", "/path/");
+		const page = new SimpleFragmentsContainer();
 		page.add(
+			new Heading("title", 1),
 			new SimpleFragment('simple fragment'),
 			new Paragraph(['Paragraph 1 ', new Bold('bold')]),
 			new Paragraph(new Italic('Italic text')),

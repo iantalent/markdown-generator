@@ -162,7 +162,7 @@ export class MarkdownBuilder
 		);*/
 	}
 	
-	private prependEmptyLines(lines: Array<MarkdownLine>, count: number, prefixes: Array<string> = [])
+	private prependEmptyLines(lines: Array<MarkdownLine>, count: number, index: number, prefixes: Array<string> = [])
 	{
 		for(let i = 0; i < count; i++)
 		{
@@ -171,9 +171,9 @@ export class MarkdownBuilder
 			if(prefixes.length)
 				line.prefixes = [...prefixes];
 			
-			console.log(prefixes);
+			line.splittedByLeft = line.splittedByRight = true;
 			
-			lines.push(line);
+			lines.splice(index + i, 0, line);
 		}
 	}
 	
@@ -207,10 +207,13 @@ export class MarkdownBuilder
 						this.prependEmptyLines(
 							merged,
 							Math.max(prevToMerge.needLineBreakAfter, line.needLineBreakBefore) - 1,
+							merged.length - 1,
 							prevToMerge.prefixes
 						);
+						prevToMerge = merged[merged.length - 1];
 					}
-					prevToMerge = line;
+					else
+						prevToMerge = line;
 				}
 			}
 		});
