@@ -4,16 +4,22 @@ import {
 	BlockQuote,
 	Bold,
 	Code,
-	CodeBlock, ContentLevel, Emoji, Highlight,
-	Italic, Link, ListItem,
+	CodeBlock,
+	Emoji,
+	Highlight,
+	Italic,
+	Link,
 	Paragraph,
 	SimpleFragment,
 	SimplePage,
-	StrikeThrough, Subscript, Superscript,
-	Tip, TodoList, TodoListItem, UnorderedList,
+	StrikeThrough,
+	Subscript,
+	Superscript,
+	Tip,
+	TodoList,
+	UnorderedList,
 } from "../lib";
 import {buildMarkdown} from "../lib/utils";
-import MarkdownIt = require("markdown-it");
 import {MarkdownLine} from "../lib/builder";
 
 const assert = chai.assert;

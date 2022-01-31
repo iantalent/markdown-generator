@@ -3,7 +3,6 @@ import {Page} from "./page";
 import {isFragment, isFragmentsContainer} from "./utils";
 import {getTypeOrFunctionValue} from "./type";
 import {ContentLevel, Fragment, FragmentContent, FragmentLevel, IndentFragment, LinePrefixFragment} from "./fragment";
-import {Entry} from "webpack";
 
 type Container = FragmentsContainer | Page | Array<FragmentsContainerEntry>;
 
@@ -73,8 +72,11 @@ export class MarkdownLine
 			throw new Error('This lines can\'t be merged. You should check it before merge (via canBeMerged)');
 		
 		this.lineContent += line.lineContent;
+		
 		if(line.needLineBreakAfter > 0)
 			this.needLineBreakAfter = line.needLineBreakAfter;
+		
+		this.splittedByRight = line.splittedByRight;
 	}
 	
 	isEmpty()
@@ -160,10 +162,19 @@ export class MarkdownBuilder
 		);*/
 	}
 	
-	private prependEmptyLines(lines: Array<MarkdownLine>, count: number)
+	private prependEmptyLines(lines: Array<MarkdownLine>, count: number, prefixes: Array<string> = [])
 	{
 		for(let i = 0; i < count; i++)
-			lines.push(new MarkdownLine(''));
+		{
+			const line = new MarkdownLine('');
+			
+			if(prefixes.length)
+				line.prefixes = [...prefixes];
+			
+			console.log(prefixes);
+			
+			lines.push(line);
+		}
 	}
 	
 	private mergeLines(lines: Array<MarkdownLine>): Array<MarkdownLine>
@@ -195,7 +206,8 @@ export class MarkdownBuilder
 						prependedNewLine = true;
 						this.prependEmptyLines(
 							merged,
-							Math.max(prevToMerge.needLineBreakAfter, line.needLineBreakBefore) - 1
+							Math.max(prevToMerge.needLineBreakAfter, line.needLineBreakBefore) - 1,
+							prevToMerge.prefixes
 						);
 					}
 					prevToMerge = line;
