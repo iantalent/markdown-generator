@@ -107,6 +107,13 @@ class pageFragments
 		
 		assert.equal(
 			buildMarkdown(
+				[new BlockQuote(['first', new BlockQuote('second'), new Paragraph('paragraph')])]
+			),
+			'> first\r\n>\r\n>> second\r\n\r\nparagraph'
+		);
+		
+		assert.equal(
+			buildMarkdown(
 				[new BlockQuote([
 					'start',
 					new Paragraph('second'),
