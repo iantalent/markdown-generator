@@ -27,6 +27,16 @@ class BlockQuoteTest
 			buildMarkdown(
 				[new BlockQuote(['first', new BlockQuote('second'), new Paragraph('paragraph')])]
 			),
+			'> first\r\n>\r\n>> second\r\n>\r\n> paragraph'
+		);
+	}
+	
+	@test 'double with paragraph after'()
+	{
+		assert.equal(
+			buildMarkdown(
+				[new BlockQuote(['first', new BlockQuote('second')]), new Paragraph('paragraph')]
+			),
 			'> first\r\n>\r\n>> second\r\n\r\nparagraph'
 		);
 	}
