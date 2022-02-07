@@ -33,12 +33,37 @@ function isLinePrefixFragment(fragment: any): fragment is LinePrefixFragment
 	return ['string', 'function'].indexOf(typeof fragment['linePrefix']) !== -1 && isFragment(fragment);
 }
 
+function getContentLevelLineBreaks(level: ContentLevel)
+{
+	switch(level)
+	{
+		case ContentLevel.BLOCK:
+			return 2;
+		case ContentLevel.LINE:
+			return 1;
+		default:
+			return 0;
+	}
+}
+
+function getFragmentContentLevel(fragment: Fragment): ContentLevel
+{
+	if(isContentLevel(fragment))
+	{
+		const contentLevel = getTypeOrFunctionValue(fragment.level, fragment);
+		
+		if(contentLevel)
+			return contentLevel;
+	}
+	return ContentLevel.DEFAULT;
+}
+
 export class MarkdownLine
 {
 	prefixes: Array<string> = [];
 	indent: number = 0;
-	needLineBreakBefore: number = 0;
-	needLineBreakAfter: number = 0;
+	levelStart: ContentLevel = ContentLevel.DEFAULT;
+	levelEnd: ContentLevel = ContentLevel.DEFAULT;
 	splittedByLeft: boolean = false;
 	splittedByRight: boolean = false;
 	
@@ -63,7 +88,8 @@ export class MarkdownLine
 	
 	canBeMerged(line: MarkdownLine): boolean
 	{
-		return this.needLineBreakAfter <= 0 && line.needLineBreakBefore <= 0 && (!this.splittedByRight && !line.splittedByLeft);
+		return this.levelEnd === ContentLevel.DEFAULT && line.levelStart === ContentLevel.DEFAULT &&
+			(!this.splittedByRight && !line.splittedByLeft);
 	}
 	
 	merge(line: MarkdownLine)
@@ -72,10 +98,7 @@ export class MarkdownLine
 			throw new Error('This lines can\'t be merged. You should check it before merge (via canBeMerged)');
 		
 		this.lineContent += line.lineContent;
-		
-		if(line.needLineBreakAfter > 0)
-			this.needLineBreakAfter = line.needLineBreakAfter;
-		
+		this.levelEnd = line.levelEnd;
 		this.splittedByRight = line.splittedByRight;
 	}
 	
@@ -199,14 +222,16 @@ export class MarkdownBuilder
 				}
 				else
 				{
-					if(prevToMerge.needLineBreakAfter > 1 || line.needLineBreakBefore > 1)
+					const prevLineBreaks = getContentLevelLineBreaks(prevToMerge.levelEnd),
+						afterLineBreaks = getContentLevelLineBreaks(line.levelStart);
+					if(prevLineBreaks > 1 || afterLineBreaks > 1)
 					{
 						prependedNewLine = true;
 						this.prependEmptyLines(
 							merged,
-							Math.max(prevToMerge.needLineBreakAfter, line.needLineBreakBefore) - 1,
+							Math.max(prevLineBreaks, afterLineBreaks) - 1,
 							merged.length - 1,
-							line.needLineBreakBefore > 1 && line.prefixes.length < prevToMerge.prefixes.length ? line.prefixes : prevToMerge.prefixes
+							afterLineBreaks > 1 && line.prefixes.length < prevToMerge.prefixes.length ? line.prefixes : prevToMerge.prefixes
 						);
 						prevToMerge = merged[merged.length - 1];
 					}
@@ -257,14 +282,7 @@ export class MarkdownBuilder
 				entryLines = this.buildFragment(entry);
 				let prefix = isLinePrefixFragment(entry) ? getTypeOrFunctionValue(entry.linePrefix, entry) : null,
 					indent = isIndentFragment(entry),
-					lineLevel: ContentLevel | null = null;
-				
-				
-				if(isContentLevel(entry))
-					lineLevel = getTypeOrFunctionValue(entry.level, entry);
-				
-				if(!lineLevel)
-					lineLevel = ContentLevel.DEFAULT;
+					lineLevel = getFragmentContentLevel(entry);
 				
 				if(prefix || indent || lineLevel !== ContentLevel.DEFAULT)
 				{
@@ -279,10 +297,10 @@ export class MarkdownBuilder
 						if(lineLevel !== ContentLevel.DEFAULT)
 						{
 							if(index === 0)
-								line.needLineBreakBefore = lineLevel === ContentLevel.BLOCK ? 2 : 1;
+								line.levelStart = lineLevel;
 							
 							if(index === entryLines.length - 1)
-								line.needLineBreakAfter = lineLevel === ContentLevel.BLOCK ? 2 : 1;
+								line.levelEnd = lineLevel;
 						}
 					});
 				}
