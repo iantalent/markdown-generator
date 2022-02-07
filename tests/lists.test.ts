@@ -1,6 +1,6 @@
 import {suite, test} from '@testdeck/mocha';
 import * as chai from 'chai';
-import {BlockQuote, OrderedList, TodoList, UnorderedList,} from "../lib";
+import {BlockQuote, OrderedList, Paragraph, TodoList, UnorderedList,} from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
@@ -45,6 +45,19 @@ class ListsTest
 					.add(true, 'third')
 			]),
 			'[x] first\r\n[ ] second\r\n[x] third'
+		);
+	}
+	
+	@test 'single level with block level element'()
+	{
+		assert.equal(
+			buildMarkdown([
+				(new UnorderedList())
+					.add('first')
+					.add(['second', new Paragraph('paragraph')])
+					.add('third')
+			]),
+			'- first\r\n- second\r\n\r\n\tparagraph\r\n\r\n- third'
 		);
 	}
 	
