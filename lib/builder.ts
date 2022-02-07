@@ -46,6 +46,34 @@ function getContentLevelLineBreaks(level: ContentLevel)
 	}
 }
 
+function modifyLineContent(lines: Array<MarkdownLine>)
+{
+	let linesLevel = 0,
+		blockLevel = 0;
+
+	lines.forEach(line =>
+	{
+		if(line.levelStart === ContentLevel.LINE)
+			linesLevel++;
+		else if(line.levelStart === ContentLevel.BLOCK)
+			blockLevel++;
+		
+		if(linesLevel === 1 && blockLevel > 0)
+			line.indent++;
+		
+		if(line.levelEnd === ContentLevel.LINE)
+			linesLevel--;
+		else if(line.levelEnd === ContentLevel.BLOCK)
+			blockLevel--;
+	});
+}
+
+function modifyLinesByContentLevel(level: ContentLevel, lines: Array<MarkdownLine>)
+{
+	if(level === ContentLevel.LINE)
+		modifyLineContent(lines);
+}
+
 function getFragmentContentLevel(fragment: Fragment): ContentLevel
 {
 	if(isContentLevel(fragment))
@@ -304,6 +332,8 @@ export class MarkdownBuilder
 						}
 					});
 				}
+				
+				modifyLinesByContentLevel(lineLevel, entryLines);
 			}
 			else
 				throw new Error('There is wrong item in container. Allowed only Fragment, FragmentsContainer, string. Got ' + typeof entry);
