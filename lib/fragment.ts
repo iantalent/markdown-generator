@@ -10,9 +10,9 @@ export interface Fragment
 
 export enum ContentLevel
 {
-	DEFAULT = 1, // TODO make it strings breaks building
-	LINE = 2,
-	BLOCK = 3
+	DEFAULT = "DEFAULT",
+	LINE = 'LINE',
+	BLOCK = "BLOCK"
 }
 
 export interface FragmentLevel extends Fragment
