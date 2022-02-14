@@ -101,12 +101,12 @@ class ListsTest
 						(new UnorderedList())
 							.add('third')
 							.add('fourth')
-							.add(['six', new BlockQuote('quote')])
+							.add(['six', new BlockQuote('quote test')])
 					)
 					.add('seven')
 			
 			]),
-			'- first\r\n- second\r\n\t- third\r\n\t- fourth\r\n\t- six\r\n\r\n\t\t> quote\r\n\r\n- seven'
+			'- first\r\n- second\r\n\t- third\r\n\t- fourth\r\n\t- six\r\n\r\n\t\t> quote test\r\n\r\n- seven'
 		);
 	}
 	

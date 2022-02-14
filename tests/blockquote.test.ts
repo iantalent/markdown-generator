@@ -1,6 +1,6 @@
 import {suite, test} from '@testdeck/mocha';
 import * as chai from 'chai';
-import {BlockQuote, Paragraph,} from "../lib";
+import {BlockQuote, Paragraph, UnorderedList,} from "../lib";
 import {buildMarkdown} from "../lib/utils";
 
 const assert = chai.assert;
@@ -57,6 +57,21 @@ class BlockQuoteTest
 			),
 			'> first\r\n>\r\n> second'
 		);
+	}
+	
+	@test 'with lists'()
+	{
+		assert.equal(
+			buildMarkdown([new BlockQuote([
+				'start',
+				(new UnorderedList())
+					.add('first')
+					.add('second')
+					.add('third'),
+				'end'
+			])]),
+			'> start\r\n> - first\r\n> - second\r\n> - third\r\n> end'
+		)
 	}
 	
 	@test 'pragraph complex'()

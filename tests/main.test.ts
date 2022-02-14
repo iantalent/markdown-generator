@@ -7,7 +7,6 @@ import {
 	Emoji,
 	Heading,
 	Italic,
-	Link,
 	Paragraph,
 	SimpleFragment,
 	SimpleFragmentsContainer,
