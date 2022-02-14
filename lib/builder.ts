@@ -50,7 +50,7 @@ function modifyLineContent(lines: Array<MarkdownLine>)
 {
 	let linesLevel = 0,
 		blockLevel = 0;
-
+	
 	lines.forEach(line =>
 	{
 		if(line.levelStart === ContentLevel.LINE)
@@ -72,6 +72,18 @@ function modifyLinesByContentLevel(level: ContentLevel, lines: Array<MarkdownLin
 {
 	if(level === ContentLevel.LINE)
 		modifyLineContent(lines);
+}
+
+function modifySubLinesByContentLevel(level: ContentLevel, line: MarkdownLine, index: number, linesCount: number)
+{
+	if(level === ContentLevel.DEFAULT)
+		return;
+	
+	if(index === 0 && line.levelStart !== ContentLevel.BLOCK)
+		line.levelStart = level;
+	
+	if(index === linesCount - 1 && line.levelEnd !== ContentLevel.BLOCK)
+		line.levelEnd = level;
 }
 
 function getFragmentContentLevel(fragment: Fragment): ContentLevel
@@ -160,30 +172,11 @@ export class MarkdownBuilder
 				this.buildContainerFragments(this.rootContainer)
 			)
 		);
-		/*return this.buildFragmentsResults(
-			this.buildContainerFragmentsOld(this.rootContainer)
-		);*/
-	}
-	
-	private prependEmptyLines(lines: Array<MarkdownLine>, count: number, index: number, prefixes: Array<string> = [])
-	{
-		for(let i = 0; i < count; i++)
-		{
-			const line = new MarkdownLine('');
-			
-			if(prefixes.length)
-				line.prefixes = [...prefixes];
-			
-			line.splittedByLeft = line.splittedByRight = true;
-			
-			lines.splice(index + i, 0, line);
-		}
 	}
 	
 	private mergeLines(lines: Array<MarkdownLine>): Array<MarkdownLine>
 	{
 		const merged: Array<MarkdownLine> = [];
-		let prependedNewLine = false;
 		
 		let prevToMerge: MarkdownLine | null = null;
 		
@@ -202,25 +195,34 @@ export class MarkdownBuilder
 				}
 				else
 				{
-					const prevLineBreaks = getContentLevelLineBreaks(prevToMerge.levelEnd),
-						afterLineBreaks = getContentLevelLineBreaks(line.levelStart);
-					if(prevLineBreaks > 1 || afterLineBreaks > 1)
-					{
-						prependedNewLine = true;
-						this.prependEmptyLines(
-							merged,
-							Math.max(prevLineBreaks, afterLineBreaks) - 1,
-							merged.length - 1,
-							afterLineBreaks > 1 && line.prefixes.length < prevToMerge.prefixes.length ? line.prefixes : prevToMerge.prefixes
-						);
-						prevToMerge = merged[merged.length - 1];
-					}
-					else
-						prevToMerge = line;
+					this.prependEmptyLines(merged, merged.length - 1, line, prevToMerge);
+					prevToMerge = merged[merged.length - 1];
 				}
 			}
 		});
 		return merged;
+	}
+	
+	private prependEmptyLines(lines: Array<MarkdownLine>, index: number, line: MarkdownLine, previousLine: MarkdownLine)
+	{
+		const prevLineBreaks = getContentLevelLineBreaks(previousLine.levelEnd),
+			afterLineBreaks = getContentLevelLineBreaks(line.levelStart);
+		
+		if(prevLineBreaks <= 1 && afterLineBreaks <= 1)
+			return;
+		
+		for(let i = 1; i < Math.max(prevLineBreaks, afterLineBreaks); i++)
+		{
+			const newLine = new MarkdownLine(''),
+				prefixes = line.prefixes.length <= previousLine.prefixes.length ? line.prefixes : previousLine.prefixes;
+			
+			if(prefixes.length)
+				newLine.prefixes = [...prefixes];
+			
+			newLine.splittedByLeft = newLine.splittedByRight = true;
+			
+			lines.splice(index + i - 1, 0, newLine);
+		}
 	}
 	
 	private buildLines(lines: Array<MarkdownLine>): string
@@ -249,9 +251,17 @@ export class MarkdownBuilder
 		if(Array.isArray(container))
 			container = createContainerFromArray(container);
 		
-		container.tree().forEach(entry =>
+		const separator = isSeparatedFragmentsContainer(container) ? getTypeOrFunctionValue(
+			container.separator,
+			container
+		) : '';
+		
+		container.tree().forEach((entry, index, array) =>
 		{
 			let entryLines: Array<MarkdownLine>;
+			
+			if(index > 0 && separator)
+				lines.push(new MarkdownLine(separator));
 			
 			if(typeof entry === 'string')
 				entryLines = MarkdownLine.fromContent(entry);
@@ -274,14 +284,7 @@ export class MarkdownBuilder
 						if(indent)
 							line.indent++;
 						
-						if(lineLevel !== ContentLevel.DEFAULT)
-						{
-							if(index === 0)
-								line.levelStart = lineLevel;
-							
-							if(index === entryLines.length - 1)
-								line.levelEnd = lineLevel;
-						}
+						modifySubLinesByContentLevel(lineLevel, line, index, entryLines.length);
 					});
 				}
 				

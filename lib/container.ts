@@ -49,19 +49,3 @@ export class SimpleFragmentsContainer implements SeparatedFragmentsContainer
 		return this.$separator;
 	}
 }
-
-export class ThroughLineContainer extends SimpleFragmentsContainer
-{
-	constructor()
-	{
-		super("\r\n");
-	}
-}
-
-export class LineFragmentsContainer extends SimpleFragmentsContainer
-{
-	constructor()
-	{
-		super("");
-	}
-}

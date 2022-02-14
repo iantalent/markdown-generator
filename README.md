@@ -1,11 +1,11 @@
 # vuepress-custom-pages
 
 - [ ] Table
-- [ ] Lists
+- [x] Lists
 - [x] Emoji
 - [x] Highlight
 - [x] Subscript
 - [x] Superscript
 - [ ] Definition Lists
 - [ ] Footnotes
-- [ ] Support SeparatedFragmentsContainer
+- [x] Support SeparatedFragmentsContainer
