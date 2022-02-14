@@ -1,18 +1,10 @@
 import {FragmentsContainer, FragmentsContainerEntry} from "./container";
-import {Page} from "./page";
 import {Fragment} from "./fragment";
 import {MarkdownBuilder} from "./builder";
 
 export function isFragmentsContainer(container: any): container is FragmentsContainer
 {
 	return typeof container['tree'] === 'function';
-}
-
-export function isPage(page: any): page is Page
-{
-	return typeof page['path'] === 'function' &&
-		typeof page['frontmatter'] === 'function' &&
-		isFragmentsContainer(page);
 }
 
 export function isFragment(fragment: any): fragment is Fragment
@@ -23,10 +15,10 @@ export function isFragment(fragment: any): fragment is Fragment
 }
 
 /**
- * @param {FragmentsContainer|Page} container
+ * @param {FragmentsContainer} container
  * @returns {string}
  */
-export function buildMarkdown(container: FragmentsContainer | Page | Array<FragmentsContainerEntry>): string
+export function buildMarkdown(container: FragmentsContainer | Array<FragmentsContainerEntry>): string
 {
 	return MarkdownBuilder.build(container);
 }

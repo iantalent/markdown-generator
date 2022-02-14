@@ -1,3 +1,3 @@
 export * from './fragment'
 export * from './container'
-export * from './page'
+export * from './utils'

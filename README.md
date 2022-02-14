@@ -1,4 +1,4 @@
-# vuepress-custom-pages
+# markdown-generator
 
 - [ ] Table
 - [x] Lists

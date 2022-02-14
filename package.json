@@ -1,5 +1,5 @@
 {
-	"name": "vuepress-plugin-custom-pages",
+	"name": "markdown-generator",
 	"version": "1.0.0",
 	"description": "",
 	"main": "dist/index.js",
@@ -11,14 +11,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/iantalent/vuepress-plugin-custom-pages.git"
+		"url": "git+https://github.com/iantalent/markdown-generator.git"
 	},
 	"author": "",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/iantalent/vuepress-plugin-custom-pages/issues"
+		"url": "https://github.com/iantalent/markdown-generator/issues"
 	},
-	"homepage": "https://github.com/iantalent/vuepress-plugin-custom-pages#readme",
+	"homepage": "https://github.com/iantalent/markdown-generator#readme",
 	"dependencies": {},
 	"devDependencies": {
 		"@testdeck/mocha": "^0.2.0",
@@ -27,7 +27,6 @@
 		"mocha": "^9.1.4",
 		"nyc": "^15.1.0",
 		"ts-node": "^10.4.0",
-		"typescript": "^4.5.4",
-		"vuepress": "^1.5.3"
+		"typescript": "^4.5.4"
 	}
 }

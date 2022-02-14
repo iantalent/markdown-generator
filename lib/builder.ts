@@ -1,10 +1,9 @@
 import {FragmentsContainer, FragmentsContainerEntry, SeparatedFragmentsContainer} from "./container";
-import {Page} from "./page";
 import {isFragment, isFragmentsContainer} from "./utils";
 import {getTypeOrFunctionValue} from "./type";
 import {ContentLevel, Fragment, FragmentContent, FragmentLevel, IndentFragment, LinePrefixFragment} from "./fragment";
 
-type Container = FragmentsContainer | Page | Array<FragmentsContainerEntry>;
+type Container = FragmentsContainer | Array<FragmentsContainerEntry>;
 
 function isSeparatedFragmentsContainer(container: any): container is SeparatedFragmentsContainer
 {

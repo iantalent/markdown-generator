@@ -9,8 +9,7 @@ import {
 	Italic,
 	Paragraph,
 	SimpleFragment,
-	SimpleFragmentsContainer,
-	Tip,
+	SimpleFragmentsContainer
 } from "../lib";
 import {buildMarkdown} from "../lib/utils";
 import {MarkdownLine} from "../lib/builder";
@@ -52,7 +51,6 @@ class pageFragments
 			new Paragraph(new Code('Boolean')),
 			{content: 'Simple fragment'},
 			{content: 'Simple fragment 2'},
-			new Tip('You should go this way not that!'),
 			new BlockQuote([
 				'quote 1', new Paragraph('paragraph'),
 				new BlockQuote([
@@ -68,7 +66,6 @@ class pageFragments
 			'*Italic text*\r\n\r\n' +
 			'`Boolean`\r\n\r\n' +
 			'Simple fragmentSimple fragment 2\r\n\r\n' +
-			'::: tip\r\n\r\nYou should go this way not that!\r\n\r\n:::\r\n\r\n' +
 			'> quote 1\r\n>\r\n> paragraph\r\n>\r\n>> quote 2\r\n>>\r\n>> paragraph 2\r\n>>\r\n>>> quote 3\r\n>>>\r\n>>> paragraph 3\r\n\r\n' +
 			'Some paragraph info');
 	}
@@ -77,11 +74,5 @@ class pageFragments
 	{
 		assert.equal(buildMarkdown([new Emoji('joy')]), ':joy:');
 		assert.equal(buildMarkdown([new Emoji('tent')]), ':tent:');
-	}
-	
-	@test 'VuePress Builtin fragments'()
-	{
-		assert.equal(buildMarkdown([new Tip('Tip content')]), '::: tip\r\n\r\nTip content\r\n\r\n:::');
-		assert.equal(buildMarkdown(['-start', '\r\n\r\n', 'info', '\r\n\r\n', '-end']), '-start\r\n\r\ninfo\r\n\r\n-end');
 	}
 }
