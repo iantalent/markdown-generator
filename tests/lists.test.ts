@@ -109,4 +109,24 @@ class ListsTest
 			'- first\r\n- second\r\n\t- third\r\n\t- fourth\r\n\t- six\r\n\r\n\t\t> quote\r\n\r\n- seven'
 		);
 	}
+	
+	@test 'lists with paragraph'()
+	{
+		assert.equal(
+			buildMarkdown([
+				(new UnorderedList())
+					.add('first')
+					.add('second')
+					.add(
+						(new UnorderedList())
+							.add('third')
+							.add('fourth')
+							.add(['six', new Paragraph('paragraph')])
+					)
+					.add('seven')
+			
+			]),
+			'- first\r\n- second\r\n\t- third\r\n\t- fourth\r\n\t- six\r\n\r\n\t\tparagraph\r\n\r\n- seven'
+		);
+	}
 }
