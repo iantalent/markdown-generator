@@ -129,4 +129,12 @@ class ListsTest
 			'- first\r\n- second\r\n\t- third\r\n\t- fourth\r\n\t- six\r\n\r\n\t\tparagraph\r\n\r\n- seven'
 		);
 	}
+	
+	@test 'lists has item'()
+	{
+		const list = new UnorderedList();
+		assert.isFalse(list.hasItems());
+		list.add('Item');
+		assert.isTrue(list.hasItems());
+	}
 }
