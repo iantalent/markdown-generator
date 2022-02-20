@@ -212,6 +212,11 @@ export abstract class List<T extends ListItem> implements IndentFragment
 		return this;
 	}
 	
+	hasItems(): boolean
+	{
+		return this.entries.length > 0;
+	}
+	
 	protected abstract prefix(item: T, listLength: number): string
 	
 	content(): FragmentContent
